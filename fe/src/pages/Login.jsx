@@ -1,34 +1,42 @@
-import Navbar from '../components/Navbar';
+import { useNavigate } from 'react-router-dom';
+import AuthForm from '../components/AuthForm';
 
 const Login = () => {
+  const navigate = useNavigate();
+
+  const handleLoginSubmit = async (formData) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData), // โยน { username, password } ไปหา Server
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('เข้าสู่ระบบสำเร็จ! 🎉');
+        localStorage.setItem('token', data.token);
+        navigate('/'); // นำทางไปหน้าแรก
+      } else {
+        alert(`เข้าสู่ระบบไม่สำเร็จ: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('เกิดข้อผิดพลาด:', error);
+      alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์หลังบ้านได้');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#0d0d11] text-white flex flex-col w-full">
-      {/* ยังคงมี Navbar อยู่ด้านบน */}
-      <Navbar />
-      
-      {/* เนื้อหาหน้าเข้าสู่ระบบ */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center w-full">
-        <div className="bg-[#0b0b0d] border border-gray-800 p-8 rounded-xl shadow-2xl max-w-sm w-full">
-          <h2 className="text-2xl font-bold text-amber-500 mb-6">เข้าสู่ระบบ</h2>
-          
-          <form className="space-y-4">
-            <input 
-              type="text" 
-              placeholder="ชื่อผู้ใช้งาน / อีเมล" 
-              className="w-full px-4 py-2 rounded bg-[#14141a] border border-gray-750 text-white focus:outline-none focus:border-amber-500 text-sm"
-            />
-            <input 
-              type="password" 
-              placeholder="รหัสผ่าน" 
-              className="w-full px-4 py-2 rounded bg-[#14141a] border border-gray-750 text-white focus:outline-none focus:border-amber-500 text-sm"
-            />
-            <button className="w-full py-2 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded transition-colors text-sm">
-              เข้าสู่ระบบ
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
+    <AuthForm
+      title="เข้าสู่ระบบ"
+      buttonText="ล็อกอิน"
+      onSubmit={handleLoginSubmit}
+      togglePath="/register"
+      toggleText="ยังไม่มีบัญชีใช่ไหม? สมัครสมาชิกที่นี่"
+    />
   );
 };
 
