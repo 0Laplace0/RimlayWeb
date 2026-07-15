@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar'; 
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
 import Login from './pages/Login';
+import Register from './pages/Register';
 
 function App() {
   const [message, setMessage] = useState('กำลังโหลดข้อมูลจาก Backend...');
@@ -29,7 +31,9 @@ function App() {
         </div>
       } />
 
+      <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
     </Routes>
   );
 }
