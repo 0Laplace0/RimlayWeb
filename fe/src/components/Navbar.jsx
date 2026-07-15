@@ -3,9 +3,9 @@ import logo from '../assets/hero.png';
 
 const Navbar = () => {
     const navLinks = [
-        { name: 'หน้าหลัก', href: '/' },
-        { name: 'ร้านค้า', href: '#' },
-        { name: 'ร้านค้ายอดสะสม', href: '#' },
+        { name: 'หน้าหลัก', href: '/home' },
+        { name: 'ร้านค้า', href: '/shop' },
+        { name: 'ร้านค้ายอดสะสม', href: '/accumulate-shop' },
         { name: 'ติดต่อเรา', href: '#' },
     ];
 
