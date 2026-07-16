@@ -1,0 +1,87 @@
+import { useState } from 'react';
+import Navbar from '../components/Navbar';
+
+import CustomerCRUD from '../components/backoffice/CustomerCRUD';
+import ShopCRUD from '../components/backoffice/ShopCRUD';
+import AccumulateShopCRUD from '../components/backoffice/AccumulateShopCRUD';
+// 1. IMPORT ไฟล์ Dashboard ตัวจริงเข้ามาใช้งาน ───
+import Dashboard from '../components/backoffice/Dashboard'; 
+
+const Backoffice = () => {
+  const [activeMenu, setActiveMenu] = useState('Dashboard');
+
+  const sidebarMenus = [
+    { id: 'Dashboard', name: '- Dashboard -' },
+    { id: 'CustomerCRUD', name: '- CustomerCRUD -' },
+    { id: 'ShopCRUD', name: '- ร้านค้าทั่วไป (Cash) -' },
+    { id: 'AccumulateShopCRUD', name: '- ร้านค้ายอดสะสม (Points) -' },
+  ];
+
+  const renderContent = () => {
+    switch (activeMenu) {
+      case 'Dashboard':
+        return <Dashboard />;
+      case 'CustomerCRUD':
+        return <CustomerCRUD />;
+      case 'ShopCRUD':
+        return <ShopCRUD />;
+      case 'AccumulateShopCRUD':
+        return <AccumulateShopCRUD />;
+      default:
+        return (
+          <div className="text-center py-24 text-gray-500">
+            <h3 className="text-purple-300 font-bold mb-1">ไม่พบเมนูจัดการนี้</h3>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0d0d11] text-white flex flex-col w-full">
+      <Navbar />
+
+      <div className="flex-1 w-full max-w-full px-6 py-8 flex flex-col lg:flex-row gap-6">
+        
+        {/* SIDEBAR */}
+        <aside className="w-full lg:w-64 shrink-0">
+          <div className="bg-[#0b0b0d] border border-purple-950/60 rounded-lg overflow-hidden shadow-2xl">
+            <div className="bg-[#181125] border-b border-purple-950/60 px-4 py-3 text-center">
+              <span className="font-bold text-purple-300 tracking-wide text-sm">Home</span>
+            </div>
+            
+            <nav className="flex flex-col">
+              {sidebarMenus.map((menu) => (
+                <button
+                  key={menu.id}
+                  onClick={() => setActiveMenu(menu.id)}
+                  className={`w-full py-3 px-4 text-xs font-semibold text-center border-b border-purple-950/20 transition-all duration-300 ${
+                    activeMenu === menu.id
+                      ? 'bg-purple-600/10 text-purple-400 border-r-4 border-r-purple-500'
+                      : 'text-gray-400 hover:bg-[#121217] hover:text-purple-300'
+                  }`}
+                >
+                  {menu.name}
+                </button>
+              ))}
+              
+              <button
+                onClick={() => alert("ออกจากระบบแล้ว")}
+                className="w-full py-3 px-4 text-xs font-semibold text-center text-rose-400 bg-rose-950/10 hover:bg-rose-950/20 transition-all duration-300"
+              >
+                - ออกจากระบบ -
+              </button>
+            </nav>
+          </div>
+        </aside>
+
+        {/* CONTENT AREA ขยายกว้างสุด */}
+        <main className="flex-1 bg-[#0b0b0d] border border-purple-950/60 rounded-lg p-6 md:p-8 shadow-2xl min-h-[600px] overflow-hidden">
+          {renderContent()}
+        </main>
+
+      </div>
+    </div>
+  );
+};
+
+export default Backoffice;

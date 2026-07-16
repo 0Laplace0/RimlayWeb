@@ -7,6 +7,7 @@ const Navbar = () => {
         { name: 'ร้านค้า', href: '/shop' },
         { name: 'ร้านค้ายอดสะสม', href: '/accumulate-shop' },
         { name: 'ติดต่อเรา', href: '#' },
+        { name: 'BackOffice', href: '/backoffice' }, 
     ];
 
     return (
