@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
+import { swalUtils } from '../utils/swalUtils';
 
 const Home = () => {
   // --- 1. ข้อมูลรูปภาพสำหรับ Carousel ---
@@ -59,10 +60,32 @@ const Home = () => {
     setCurrentPage(1);
   }, [activeTab]);
 
-  // --- ฟังก์ชันสำหรับการคลิกซื้อของ ---
-  const handleBuy = (product) => {
-    alert(`คุณได้ทำการสั่งซื้อ: ${product.name} ในราคา ${product.price} ${product.unit} เรียบร้อยแล้ว!`);
-    setSelectedProduct(null); // ปิดป๊อปอัพหลังจากกดซื้อ
+  // --- ฟังก์ชันสำหรับการคลิกซื้อของแบบพรีเมียม ---
+  const handleBuy = async (product) => {
+    // ปิดหน้าต่าง Popup รายละเอียดสินค้าก่อน เพื่อไม่ให้ UI ซ้อนทับกัน
+    setSelectedProduct(null);
+
+    const isPoint = product.unit.toLowerCase().startsWith('point');
+
+    // แสดงกล่องแจ้งเตือนยืนยันการทำรายการตามประเภทสกุลเงิน
+    const result = await swalUtils.confirm({
+      title: isPoint ? 'ยืนยันการแลกรับของรางวัล?' : 'ยืนยันการสั่งซื้อสินค้า?',
+      text: isPoint
+        ? `คุณต้องการใช้แต้มสะสมแลกรางวัล "${product.name}" จำนวน ${product.price.toLocaleString()} ${product.unit} ใช่หรือไม่?`
+        : `คุณกำลังจะซื้อสินค้า "${product.name}" ในราคา ${product.price.toLocaleString()} ${product.unit}`,
+      confirmButtonText: isPoint ? 'ยืนยันแลกของรางวัล' : 'ยืนยันการซื้อ',
+      cancelButtonText: 'ยกเลิก',
+    });
+
+    // หากกดยืนยันสำเร็จ
+    if (result.isConfirmed) {
+      swalUtils.success(
+        isPoint ? 'แลกของรางวัลสำเร็จ!' : 'สั่งซื้อสินค้าสำเร็จ!',
+        isPoint
+          ? `ได้ทำการแลกรับ "${product.name}" เรียบร้อยแล้ว (ใช้แต้มสะสมไป ${product.price.toLocaleString()} ${product.unit})`
+          : `คุณได้ซื้อสินค้า "${product.name}" เรียบร้อยแล้ว (หักเงิน ${product.price.toLocaleString()} ${product.unit})`
+      );
+    }
   };
 
   return (
