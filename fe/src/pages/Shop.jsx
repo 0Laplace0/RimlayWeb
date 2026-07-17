@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import ProductGrid from '../components/ProductGrid';
 import ItemDetailModal from '../components/ItemDetailModal';
+import { swalUtils } from '../utils/swalUtils';
 
 const Shop = () => {
   // State คุมการเปิดปิดและเลือกสินค้าเพื่อแสดงผลใน Pop-up
@@ -23,10 +24,26 @@ const Shop = () => {
     setIsModalOpen(true);
   };
 
-  // ฟังก์ชันกดยืนยันสั่งซื้อ
-  const handleBuy = (product) => {
-    alert(`คุณได้ทำการสั่งซื้อ: ${product.name} ในราคา ${product.price} Cash เรียบร้อยแล้ว!`);
+  // ฟังก์ชันกดยืนยันสั่งซื้อแบบพรีเมียม
+  const handleBuy = async (product) => {
+    // ปิด Modal รายละเอียดก่อนเพื่อไม่ให้ทับซ้อนกัน
     setIsModalOpen(false);
+
+    // แสดงกล่องยืนยันการซื้อสินค้า
+    const result = await swalUtils.confirm({
+      title: 'ยืนยันการสั่งซื้อสินค้า?',
+      text: `คุณกำลังจะซื้อสินค้า "${product.name}" ในราคา ${product.price.toLocaleString()} Cash`,
+      confirmButtonText: 'ยืนยันการซื้อ',
+      cancelButtonText: 'ยกเลิก',
+    });
+
+    // หากผู้ใช้งานกดยืนยัน
+    if (result.isConfirmed) {
+      swalUtils.success(
+        'สั่งซื้อสำเร็จ!',
+        `คุณได้ซื้อ "${product.name}" เรียบร้อยแล้ว (หักเงิน ${product.price.toLocaleString()} Cash)`
+      );
+    }
   };
 
   return (
@@ -35,7 +52,6 @@ const Shop = () => {
       
       <div className="flex-1 max-w-6xl w-full mx-auto px-4 py-8 flex flex-col items-center">
         <div className="w-full max-w-[1000px]">
-          {/* Grid รายการสินค้า */}
           <ProductGrid 
             products={shopProducts} 
             title="MAIN SHOP" 
@@ -48,7 +64,6 @@ const Shop = () => {
         </div>
       </div>
 
-      {/* POP-UP MODAL แสดงรายละเอียดไอเท็มแบบแยกอิสระ */}
       <ItemDetailModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
