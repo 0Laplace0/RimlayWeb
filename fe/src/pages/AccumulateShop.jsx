@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import ProductGrid from '../components/ProductGrid';
 import ItemDetailModal from '../components/ItemDetailModal';
+import { swalUtils } from '../utils/swalUtils';
 
 const AccumulateShop = () => {
   // State คุมการเปิดปิดและเลือกสินค้าเพื่อแสดงผลใน Pop-up
@@ -23,20 +24,34 @@ const AccumulateShop = () => {
     setIsModalOpen(true);
   };
 
-  // ฟังก์ชันกดยืนยันการสั่งซื้อหรือแลกไอเท็มสะสม
-  const handleBuy = (product) => {
-    alert(`คุณได้ทำการใช้แต้มสะสมแลก: ${product.name} จำนวน ${product.price} Points เรียบร้อยแล้ว!`);
+  // ฟังก์ชันกดยืนยันการสั่งซื้อหรือแลกไอเท็มสะสมแบบพรีเมียม
+  const handleBuy = async (product) => {
+    // ปิด Modal รายละเอียดก่อนเพื่อหลีกเลี่ยง UI ทับซ้อน
     setIsModalOpen(false);
+
+    // แสดงกล่องยืนยันการใช้แต้มแลกสินค้า
+    const result = await swalUtils.confirm({
+      title: 'ยืนยันการแลกรับของรางวัล?',
+      text: `คุณต้องการใช้คะแนนสะสมแลกรางวัล "${product.name}" จำนวน ${product.price.toLocaleString()} Points ใช่หรือไม่?`,
+      confirmButtonText: 'ยืนยันแลกของรางวัล',
+      cancelButtonText: 'ยกเลิก',
+    });
+
+    // หากผู้ใช้งานกดยืนยันการแลก
+    if (result.isConfirmed) {
+      swalUtils.success(
+        'แลกของรางวัลสำเร็จ!',
+        `ได้ทำการแลกรับ "${product.name}" เรียบร้อยแล้ว (ใช้ไป ${product.price.toLocaleString()} Points)`
+      );
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#0d0d11] text-white flex flex-col w-full">
-
       <Navbar />
       
       <div className="flex-1 max-w-6xl w-full mx-auto px-4 py-8 flex flex-col items-center">
         <div className="w-full max-w-[1000px]">
-
           <ProductGrid 
             products={accumulateProducts} 
             title="ACCUMULATE SHOP" 
