@@ -16,18 +16,20 @@ const ShopCRUD = () => {
   ]);
 
   const [view, setView] = useState('table');
-  const [form, setForm] = useState({ id: null, name: '', price: '', description: '', picUrl: '' });
+  const [form, setForm] = useState({ id: null, name: '', price: '', description: '', image: '' });
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  const defaultPic = 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80';
+
   const handleOpenAdd = () => {
-    setForm({ id: null, name: '', price: '', description: '', picUrl: '' });
+    setForm({ id: null, name: '', price: '', description: '', image: '' });
     setView('add');
   };
 
   const handleOpenEdit = (item) => {
-    setForm({ id: item.id, name: item.name, price: item.price, description: item.description, picUrl: item.image || '' });
+    setForm({ id: item.id, name: item.name, price: item.price, description: item.description, image: item.image || '' });
     setView('edit');
   };
 
@@ -37,25 +39,40 @@ const ShopCRUD = () => {
     }
   };
 
+  // ฟังก์ชันแปลงไฟล์รูปภาพเป็น Base64
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setForm({ ...form, image: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const defaultPic = 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80';
+    
+    // ตรวจสอบและป้องกันราคาติดลบ
+    const sanitizedPrice = Math.max(0, Number(form.price)).toString();
+
     if (view === 'add') {
       const newItem = {
         id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
         name: form.name,
-        price: form.price,
+        price: sanitizedPrice,
         description: form.description,
-        image: form.picUrl || defaultPic
+        image: form.image || defaultPic
       };
       setProducts([...products, newItem]);
     } else {
       setProducts(products.map(p => p.id === form.id ? { 
         ...p, 
         name: form.name, 
-        price: form.price, 
+        price: sanitizedPrice, 
         description: form.description, 
-        image: form.picUrl || p.image || defaultPic 
+        image: form.image || p.image || defaultPic 
       } : p));
     }
     setView('table');
@@ -93,7 +110,6 @@ const ShopCRUD = () => {
                 }}
                 className="w-full md:w-64 px-5 py-2 rounded-full bg-[#121216] border border-purple-950/80 focus:outline-none focus:border-purple-500 text-sm text-white placeholder-gray-500 shadow-inner"
               />
-              {/* เปลี่ยนเป็นปุ่ม Pill ทรงเรียวโค้งมน */}
               <button
                 onClick={handleOpenAdd}
                 className="px-6 py-2 bg-blue-600 hover:bg-blue-500 rounded-full text-sm font-bold transition shrink-0 shadow-lg shadow-blue-600/20"
@@ -123,7 +139,7 @@ const ShopCRUD = () => {
                     </td>
                     <td className="p-2 text-center">
                       <img 
-                        src={p.image || 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80'} 
+                        src={p.image || defaultPic} 
                         alt={p.name}
                         className="w-12 h-12 object-cover rounded border border-purple-500/50 shadow mx-auto"
                       />
@@ -132,7 +148,6 @@ const ShopCRUD = () => {
                       {p.name} <span className="text-xs text-gray-500 font-normal ml-3">({p.description})</span>
                     </td>
                     <td className="p-4 text-emerald-400 font-bold">{p.price} Cash</td>
-                    {/* อัปเดตปุ่มในตารางเป็น rounded-full (Pill) */}
                     <td className="p-4 text-center">
                       <button
                         onClick={() => handleOpenEdit(p)}
@@ -162,7 +177,6 @@ const ShopCRUD = () => {
             </table>
           </div>
 
-          {/* ปรับ Pagination ให้เป็น Pill */}
           {totalPages > 1 && (
             <div className="flex justify-between items-center mt-5 px-1">
               <div className="text-xs text-gray-400">
@@ -242,6 +256,7 @@ const ShopCRUD = () => {
               <input
                 type="number"
                 required
+                min="0"
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
                 placeholder="Product price"
@@ -249,18 +264,49 @@ const ShopCRUD = () => {
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center">
-              <label className="sm:w-32 text-gray-400 font-semibold mb-1">Pic (URL)</label>
-              <input
-                type="text"
-                value={form.picUrl}
-                onChange={(e) => setForm({ ...form, picUrl: e.target.value })}
-                placeholder="Paste Product Image URL here"
-                className="flex-1 px-4 py-2 rounded-full bg-[#121216] border border-purple-950/60 focus:outline-none focus:border-purple-500 text-white text-xs"
-              />
+            <div className="flex flex-col sm:flex-row sm:items-start">
+              <label className="sm:w-32 text-gray-400 font-semibold mb-1 sm:mt-2">Product Pic</label>
+              <div className="flex-1 space-y-3">
+                <div className="flex items-center justify-center w-full">
+                  <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-purple-950/60 rounded-2xl cursor-pointer bg-[#121216] hover:bg-purple-950/10 hover:border-purple-500/50 transition">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <svg className="w-8 h-8 mb-2 text-purple-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                      </svg>
+                      <p className="text-xs text-gray-400">
+                        <span className="font-semibold text-purple-300">Click to upload</span> or drag and drop
+                      </p>
+                    </div>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleImageChange} 
+                      className="hidden" 
+                    />
+                  </label>
+                </div>
+                {form.image && (
+                  <div className="flex items-center gap-3 bg-[#181125]/40 p-2 rounded-xl border border-purple-950/40">
+                    <img 
+                      src={form.image} 
+                      alt="Preview" 
+                      className="w-12 h-12 object-cover rounded-lg border border-purple-500/40"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-purple-300 truncate">Image Selected</p>
+                      <button 
+                        type="button" 
+                        onClick={() => setForm({ ...form, image: '' })}
+                        className="text-[10px] text-rose-400 hover:underline"
+                      >
+                        Remove image
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* ปุ่มส่งฟอร์มเป็น rounded-full (Pill) */}
             <div className="flex items-center space-x-3 pt-4 sm:pl-32">
               <button
                 type="submit"
