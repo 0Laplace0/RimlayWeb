@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
 
+import CarouselCRUD from '../components/backoffice/CarouselCRUD';
 import CustomerCRUD from '../components/backoffice/CustomerCRUD';
 import ShopCRUD from '../components/backoffice/ShopCRUD';
 import AccumulateShopCRUD from '../components/backoffice/AccumulateShopCRUD';
-// 1. IMPORT ไฟล์ Dashboard ตัวจริงเข้ามาใช้งาน ───
 import Dashboard from '../components/backoffice/Dashboard'; 
 
 const Backoffice = () => {
@@ -12,6 +12,7 @@ const Backoffice = () => {
 
   const sidebarMenus = [
     { id: 'Dashboard', name: '- Dashboard -' },
+    { id: 'CarouselCRUD', name: '- CarouselCRUD -' },
     { id: 'CustomerCRUD', name: '- CustomerCRUD -' },
     { id: 'ShopCRUD', name: '- ร้านค้าทั่วไป (Cash) -' },
     { id: 'AccumulateShopCRUD', name: '- ร้านค้ายอดสะสม (Points) -' },
@@ -21,6 +22,8 @@ const Backoffice = () => {
     switch (activeMenu) {
       case 'Dashboard':
         return <Dashboard />;
+      case 'CarouselCRUD':
+        return <CarouselCRUD />;
       case 'CustomerCRUD':
         return <CustomerCRUD />;
       case 'ShopCRUD':

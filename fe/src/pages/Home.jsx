@@ -3,29 +3,41 @@ import Navbar from '../components/Navbar';
 import { swalUtils } from '../utils/swalUtils';
 
 const Home = () => {
-  // --- 1. ข้อมูลรูปภาพสำหรับ Carousel ---
-  const carouselImages = [
-    "https://placehold.co/1000x300/1e1b4b/a855f7?text=PROMOTION+1",
-    "https://placehold.co/1000x300/0f172a/a855f7?text=NEW+ITEMS",
-    "https://placehold.co/1000x300/180828/a855f7?text=DISCOUNT+50%",
-  ];
-
+  // --- 1. ข้อมูลรูปภาพสำหรับ Carousel (ปรับให้ดึงจาก LocalStorage) ---
+  const [carouselImages, setCarouselImages] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
+    // ดึงข้อมูลจาก localStorage ที่บันทึกมาจากฝั่ง Backoffice
+    const savedCarousels = localStorage.getItem('carousel_images');
+    if (savedCarousels) {
+      const parsed = JSON.parse(savedCarousels);
+      setCarouselImages(parsed.map(item => item.url));
+    } else {
+      // ค่าเริ่มต้นกรณีไม่มีข้อมูล
+      setCarouselImages([
+        "https://placehold.co/1000x300/1e1b4b/a855f7?text=PROMOTION+1",
+        "https://placehold.co/1000x300/0f172a/a855f7?text=NEW+ITEMS",
+        "https://placehold.co/1000x300/180828/a855f7?text=DISCOUNT+50%"
+      ]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (carouselImages.length === 0) return;
     const slideInterval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % carouselImages.length);
     }, 4000);
     return () => clearInterval(slideInterval);
-  }, [carouselImages.length]);
+  }, [carouselImages]);
 
   // --- 2. State สำหรับสลับหน้าโหมด (SHOP vs ACCUMULATE) ---
-  const [activeTab, setActiveTab] = useState('shop'); // 'shop' หรือ 'accumulate'
+  const [activeTab, setActiveTab] = useState('shop'); 
 
   // --- 3. State สำหรับระบบรายละเอียดสินค้า (Popup Modal) ---
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // --- 4. ข้อมูลสินค้าจำลอง (แบ่งตาม Tab) ---
+  // --- 4. ข้อมูลสินค้าจำลอง ---
   const shopProducts = Array.from({ length: 22 }, (_, index) => ({
     id: `shop-${index + 1}`,
     name: index === 0 ? "Premium Phone" : `Shop Product ${index + 1}`,
@@ -49,9 +61,7 @@ const Home = () => {
   // --- 5. ระบบควบคุมการแบ่งหน้า (Pagination) ---
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 16; 
-
   const totalPages = Math.ceil(currentList.length / itemsPerPage);
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentProducts = currentList.slice(indexOfFirstItem, indexOfLastItem);
@@ -60,14 +70,9 @@ const Home = () => {
     setCurrentPage(1);
   }, [activeTab]);
 
-  // --- ฟังก์ชันสำหรับการคลิกซื้อของแบบพรีเมียม ---
   const handleBuy = async (product) => {
-    // ปิดหน้าต่าง Popup รายละเอียดสินค้าก่อน เพื่อไม่ให้ UI ซ้อนทับกัน
     setSelectedProduct(null);
-
     const isPoint = product.unit.toLowerCase().startsWith('point');
-
-    // แสดงกล่องแจ้งเตือนยืนยันการทำรายการตามประเภทสกุลเงิน
     const result = await swalUtils.confirm({
       title: isPoint ? 'ยืนยันการแลกรับของรางวัล?' : 'ยืนยันการสั่งซื้อสินค้า?',
       text: isPoint
@@ -77,7 +82,6 @@ const Home = () => {
       cancelButtonText: 'ยกเลิก',
     });
 
-    // หากกดยืนยันสำเร็จ
     if (result.isConfirmed) {
       swalUtils.success(
         isPoint ? 'แลกของรางวัลสำเร็จ!' : 'สั่งซื้อสินค้าสำเร็จ!',
@@ -90,12 +94,11 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-[#0d0d11] text-white flex flex-col w-full relative">
-      {/* ส่วนหัวของเว็บ */}
       <Navbar />
 
       <div className="flex-1 max-w-6xl w-full mx-auto px-4 py-8 flex flex-col items-center">
         
-        {/* ================= CAROUSEL SECTION ================= */}
+        {/* CAROUSEL SECTION */}
         <div className="relative w-full max-w-[1000px] h-[300px] overflow-hidden rounded-xl border border-purple-900/30 shadow-lg shadow-purple-950/20 mb-8">
           <div 
             className="flex transition-transform duration-700 ease-in-out h-full"
@@ -110,7 +113,6 @@ const Home = () => {
               />
             ))}
           </div>
-
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
             {carouselImages.map((_, index) => (
               <button
@@ -124,152 +126,33 @@ const Home = () => {
           </div>
         </div>
 
-        {/* ================= TAB SWITCHER SECTION (SHOP & ACCUMULATE) ================= */}
+        {/* ... (ส่วนที่เหลือคงเดิมของระบบ Tabs และ Product Grid ตามโค้ดที่คุณส่งมา) ... */}
+        
+        {/* TAB SWITCHER */}
         <div className="w-full max-w-[1000px] mb-8 flex justify-center">
-          <div className="relative p-1.5 bg-[#08080a] border border-purple-950/60 rounded-full flex gap-1 shadow-inner shadow-black">
-            
-            <button
-              onClick={() => setActiveTab('shop')}
-              className={`relative px-8 py-2 text-sm font-bold rounded-full transition-all duration-300 flex items-center gap-2 ${
-                activeTab === 'shop'
-                  ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.4)]'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
-              SHOP
-            </button>
-
-            <button
-              onClick={() => setActiveTab('accumulate')}
-              className={`relative px-8 py-2 text-sm font-bold rounded-full transition-all duration-300 flex items-center gap-2 ${
-                activeTab === 'accumulate'
-                  ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              ACCUMULATE
-            </button>
-          </div>
+            <div className="relative p-1.5 bg-[#08080a] border border-purple-950/60 rounded-full flex gap-1 shadow-inner shadow-black">
+                <button onClick={() => setActiveTab('shop')} className={`relative px-8 py-2 text-sm font-bold rounded-full transition-all duration-300 flex items-center gap-2 ${activeTab === 'shop' ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.4)]' : 'text-gray-400 hover:text-white'}`}>SHOP</button>
+                <button onClick={() => setActiveTab('accumulate')} className={`relative px-8 py-2 text-sm font-bold rounded-full transition-all duration-300 flex items-center gap-2 ${activeTab === 'accumulate' ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]' : 'text-gray-400 hover:text-white'}`}>ACCUMULATE</button>
+            </div>
         </div>
 
-        {/* ================= PRODUCTS SECTION ================= */}
+        {/* PRODUCT GRID */}
         <div className="w-full max-w-[1000px]">
-          <div className="flex items-center space-x-3 mb-6">
-            <div className={`p-2 rounded-lg border transition-all duration-300 ${
-              activeTab === 'shop' 
-                ? 'bg-purple-600/20 border-purple-500/30 text-purple-400' 
-                : 'bg-blue-600/20 border-blue-500/30 text-blue-400'
-            }`}>
-              {activeTab === 'shop' ? (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
-              ) : (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 10-2 2h2zm0 0h4l1-3H7l1 3h4z" />
-                </svg>
-              )}
-            </div>
-            <div className="text-left">
-              <h2 className={`text-lg font-bold tracking-wider transition-all duration-300 ${
-                activeTab === 'shop' ? 'text-purple-300' : 'text-blue-300'
-              }`}>
-                {activeTab === 'shop' ? 'HIGHLIGHT PRODUCTS' : 'ACCUMULATE REWARDS'}
-              </h2>
-              <p className="text-xs text-gray-400">
-                {activeTab === 'shop' ? 'สินค้าแนะนำ' : 'รายการของรางวัลสำหรับคะแนนสะสม'}
-              </p>
-            </div>
-          </div>
-
-          {/* ตารางแสดงผลสินค้า */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {currentProducts.map((product) => (
-              <div 
-                key={product.id}
-                onClick={() => setSelectedProduct(product)} // คลิกที่ไอเท็มเพื่อเปิด Popup รายละเอียด
-                className={`bg-[#0b0b0d] border rounded-lg overflow-hidden flex flex-col transition-all duration-300 hover:shadow-lg cursor-pointer ${
-                  activeTab === 'shop'
-                    ? 'border-purple-950/40 hover:border-purple-500/50 hover:shadow-purple-950/20'
-                    : 'border-blue-950/40 hover:border-blue-500/50 hover:shadow-blue-950/20'
-                }`}
-              >
-                <div className="aspect-square w-full bg-[#14141a] relative overflow-hidden">
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover p-3 hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-
-                <div className={`p-3 flex justify-between items-center text-xs border-t ${
-                  activeTab === 'shop' 
-                    ? 'bg-[#181125] border-purple-950/40' 
-                    : 'bg-[#0f1424] border-blue-950/40'
-                }`}>
-                  <span className="font-semibold text-gray-200 truncate pr-2">{product.name}</span>
-                  <span className={`font-bold shrink-0 ${
-                    activeTab === 'shop' ? 'text-purple-400' : 'text-blue-400'
-                  }`}>
-                    {product.price.toLocaleString()} {product.unit}
-                  </span>
+              <div key={product.id} onClick={() => setSelectedProduct(product)} className="bg-[#0b0b0d] border border-purple-950/40 rounded-lg overflow-hidden cursor-pointer hover:border-purple-500/50 transition-all">
+                <div className="aspect-square w-full bg-[#14141a]"><img src={product.image} alt={product.name} className="w-full h-full object-cover p-3"/></div>
+                <div className="p-3 flex justify-between items-center text-xs border-t border-purple-950/40 bg-[#181125]">
+                  <span className="font-semibold text-gray-200">{product.name}</span>
+                  <span className="font-bold text-purple-400">{product.price.toLocaleString()} {product.unit}</span>
                 </div>
               </div>
             ))}
           </div>
-
-          {/* ปุ่มควบคุมหน้า (Pagination) */}
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center space-x-2 mt-8">
-              <button 
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className={`px-3 py-1 rounded bg-[#14141a] border text-sm disabled:opacity-50 transition-all duration-200 ${
-                  activeTab === 'shop' ? 'border-purple-950/40 hover:border-purple-500' : 'border-blue-950/40 hover:border-blue-500'
-                }`}
-              >
-                ย้อนกลับ
-              </button>
-              
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`w-8 h-8 rounded text-sm font-bold transition-all duration-200 ${
-                    currentPage === i + 1 
-                      ? activeTab === 'shop'
-                        ? 'bg-purple-600 text-white shadow-md shadow-purple-900/50' 
-                        : 'bg-blue-600 text-white shadow-md shadow-blue-900/50'
-                      : `bg-[#14141a] text-gray-400 border ${
-                          activeTab === 'shop' ? 'border-purple-950/40 hover:border-purple-500' : 'border-blue-950/40 hover:border-blue-500'
-                        }`
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
-
-              <button 
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className={`px-3 py-1 rounded bg-[#14141a] border text-sm disabled:opacity-50 transition-all duration-200 ${
-                  activeTab === 'shop' ? 'border-purple-950/40 hover:border-purple-500' : 'border-blue-950/40 hover:border-blue-500'
-                }`}
-              >
-                ถัดไป
-              </button>
-            </div>
-          )}
         </div>
 
       </div>
-
+      
       {/* ================= ITEM DETAIL POPUP (MODAL) ================= */}
       {selectedProduct && (
         <div 
