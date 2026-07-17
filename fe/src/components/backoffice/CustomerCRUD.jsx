@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import UserDetailModal from './UserDetailModal';
+import { swalUtils } from '../../utils/swalUtils';
 
 const CustomerCRUD = () => {
   // State สำหรับควบคุม Pop-up รายละเอียด
@@ -70,7 +71,7 @@ const CustomerCRUD = () => {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        alert('กรุณาเลือกไฟล์ภาพที่ถูกต้องเท่านั้นครับ!');
+        swalUtils.error('ไฟล์ไม่ถูกต้อง', 'กรุณาเลือกไฟล์ภาพที่ถูกต้องเท่านั้นครับ!');
         return;
       }
       const reader = new FileReader();
@@ -88,56 +89,104 @@ const CustomerCRUD = () => {
     }
   };
 
-  // บันทึกการ ADD / EDIT
-  const handleSubmit = (e) => {
+  // บันทึกการ ADD / EDIT พร้อมหน้าต่างตรวจสอบและแสดงข้อมูลทั้งหมด
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const balanceNum = Math.max(0, Number(form.balance)); // ป้องกันติดลบฝั่ง Logic
+    
+    const isEditMode = view === 'edit';
+    const titleText = isEditMode ? 'ตรวจสอบการแก้ไขข้อมูล' : 'ตรวจสอบข้อมูลสมาชิกใหม่';
+    const confirmBtnText = isEditMode ? 'ยืนยันอัปเดต' : 'ยืนยันบันทึกข้อมูล';
+    const avatarUrl = form.img || defaultAvatar;
 
-    if (view === 'add') {
-      const newCustomer = {
-        id: customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1,
-        name: form.name.trim(),
-        role: form.role,
-        email: form.email.trim(),
-        phone: form.phone.trim(),
-        img: form.img || defaultAvatar,
-        balance: balanceNum
-      };
-      setCustomers([...customers, newCustomer]);
-      alert(`เพิ่มสมาชิก ${newCustomer.name} สำเร็จ!`);
-    } else if (view === 'edit') {
-      setCustomers(customers.map(c => c.id === form.id ? {
-        ...c,
-        name: form.name.trim(),
-        role: form.role,
-        email: form.email.trim(),
-        phone: form.phone.trim(),
-        img: form.img || defaultAvatar,
-        balance: balanceNum
-      } : c));
-      alert(`อัปเดตข้อมูลของคุณ ${form.name} เรียบร้อยแล้ว!`);
+    const isConfirmed = await swalUtils.previewConfirm({
+      actionTitle: titleText,
+      image: avatarUrl,
+      confirmText: confirmBtnText,
+      cancelText: 'กลับไปแก้ไข',
+      fields: [
+        { label: 'ชื่อ-นามสกุล', value: form.name.trim() },
+        { 
+          label: 'บทบาท (Role)', 
+          value: form.role === 'Vip' ? 'VIP' : form.role, 
+          isSpecial: form.role !== 'Member' 
+        },
+        { label: 'อีเมล (Email)', value: form.email.trim() },
+        { label: 'เบอร์โทรศัพท์', value: form.phone.trim() },
+        { label: 'ยอดเงินคงเหลือ', value: `${Number(form.balance).toLocaleString()} ฿`, isSpecial: true }
+      ]
+    });
+
+    // ทำงานต่อเมื่อผู้ใช้กดยืนยันข้อมูลเรียบร้อยแล้ว
+    if (isConfirmed) {
+      const balanceNum = Math.max(0, Number(form.balance));
+
+      if (view === 'add') {
+        const newCustomer = {
+          id: customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1,
+          name: form.name.trim(),
+          role: form.role,
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          img: form.img || defaultAvatar,
+          balance: balanceNum
+        };
+        setCustomers([...customers, newCustomer]);
+        swalUtils.success('เพิ่มสมาชิกสำเร็จ!', `เพิ่มสมาชิก ${newCustomer.name} เรียบร้อยแล้ว`);
+      } else if (view === 'edit') {
+        setCustomers(customers.map(c => c.id === form.id ? {
+          ...c,
+          name: form.name.trim(),
+          role: form.role,
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          img: form.img || defaultAvatar,
+          balance: balanceNum
+        } : c));
+        swalUtils.success('อัปเดตสำเร็จ!', `อัปเดตข้อมูลของคุณ ${form.name} เรียบร้อยแล้ว`);
+      }
+      
+      setView('table');
     }
-    setView('table');
   };
 
-  // บันทึกการเปลี่ยนรหัสผ่าน (Reset Password)
+  // บันทึกการเปลี่ยนรหัสผ่าน (Reset Password) พร้อมระบบ Recheck
   const handleResetSubmit = (e) => {
     e.preventDefault();
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert('รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน!');
+      swalUtils.error('รหัสผ่านไม่ตรงกัน', 'กรุณาตรวจสอบการยืนยันรหัสผ่านอีกครั้ง');
       return;
     }
-    alert(`ทำการเปลี่ยนรหัสผ่านของ ${passwordForm.name} สำเร็จ! (รหัสผ่านใหม่ปลอดภัยแล้ว)`);
-    setView('table');
+
+    swalUtils.confirm({
+      title: 'ยืนยันการเปลี่ยนรหัสผ่าน?',
+      text: `คุณต้องการเปลี่ยนรหัสผ่านใหม่ของ "${passwordForm.name}" ใช่หรือไม่?`,
+      confirmButtonText: 'ใช่, เปลี่ยนรหัสผ่าน',
+      cancelButtonText: 'ยกเลิก',
+      isDangerous: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        swalUtils.success('สำเร็จ!', `ทำการเปลี่ยนรหัสผ่านของ ${passwordForm.name} เรียบร้อยแล้ว`);
+        setView('table');
+      }
+    });
   };
 
   // ลบข้อมูล Customer
   const handleDelete = (e, customer) => {
-    e.stopPropagation();
-    if (window.confirm(`คุณแน่ใจว่าต้องการลบข้อมูลของคุณ "${customer.name}" หรือไม่?`)) {
-      setCustomers(customers.filter(c => c.id !== customer.id));
-      alert('ลบข้อมูลลูกค้าเรียบร้อยแล้ว');
-    }
+    e.stopPropagation(); // ป้องกันการติด Row Click
+    
+    swalUtils.confirm({
+      title: 'คุณแน่ใจหรือไม่?',
+      text: `คุณต้องการลบข้อมูลของคุณ "${customer.name}" ใช่หรือไม่? ไม่สามารถกู้คืนได้ภายหลัง`,
+      confirmButtonText: 'ใช่, ต้องการลบ!',
+      cancelButtonText: 'ยกเลิก',
+      isDangerous: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setCustomers(customers.filter(c => c.id !== customer.id));
+        swalUtils.success('ลบข้อมูลแล้ว!', 'ลบข้อมูลลูกค้าออกจากระบบเรียบร้อย');
+      }
+    });
   };
 
   // ค้นหาข้อมูลเรียลไทม์ (Name, Email, Phone)
@@ -305,18 +354,16 @@ const CustomerCRUD = () => {
               />
             </div>
 
-            {/* ส่วนเลือก Role Status (สร้างด้วย Custom Dropdown เพื่อขอบที่โค้งมน 100% สวยงาม) */}
+            {/* ส่วนเลือก Role Status (Custom Dropdown โค้งมน 100% สวยงาม) */}
             <div className="flex flex-col sm:flex-row sm:items-center relative">
               <label className="sm:w-32 text-gray-400 font-semibold mb-1">Role Status</label>
               <div className="flex-1 relative">
-                {/* Trigger Button ของ Dropdown */}
                 <button
                   type="button"
                   onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
                   className="w-full text-left px-4 py-2 rounded-full bg-[#120f1e] border border-purple-950/60 focus:outline-none focus:border-purple-500 text-white flex justify-between items-center transition-all duration-250"
                 >
                   <span>{form.role === 'Vip' ? 'VIP' : form.role}</span>
-                  {/* ไอคอนลูกศรหมุนสลับทิศทาง */}
                   <svg 
                     className={`h-4 w-4 text-purple-400 transition-transform duration-200 ${isRoleDropdownOpen ? 'rotate-180' : ''}`} 
                     fill="none" 
@@ -327,7 +374,6 @@ const CustomerCRUD = () => {
                   </svg>
                 </button>
 
-                {/* กล่องตัวเลือก (Popover List) โค้งมนแบบ rounded-2xl และใส่ลูกเล่นสี Hover สะท้อนแสงสีม่วง */}
                 {isRoleDropdownOpen && (
                   <div className="absolute z-20 w-full mt-2 rounded-2xl bg-[#120f1e] border border-purple-500/30 shadow-2xl overflow-hidden py-1">
                     {['Member', 'Vip', 'Admin'].map((roleOption) => (

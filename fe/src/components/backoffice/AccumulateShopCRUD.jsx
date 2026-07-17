@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { swalUtils } from '../../utils/swalUtils';
 
 const AccumulateShopCRUD = () => {
   const [rewards, setRewards] = useState([
@@ -33,14 +34,14 @@ const AccumulateShopCRUD = () => {
     setView('edit');
   };
 
-  // ฟังก์ชันรองรับการอ่านไฟล์ภาพ พร้อมการตรวจสอบความถูกต้องและจำกัดขนาด
+  // ฟังก์ชันอัปโหลดไฟล์ภาพ ปรับแต่งแจ้งเตือนด้วย swalUtils.error
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // ตรวจสอบว่าเป็นไฟล์รูปภาพหรือไม่
+    // ตรวจสอบชนิดไฟล์ภาพ
     if (!file.type.startsWith('image/')) {
-      alert('กรุณาเลือกไฟล์ที่เป็นรูปภาพเท่านั้นครับ!');
+      swalUtils.error('เลือกไฟล์ไม่สำเร็จ!', 'กรุณาเลือกไฟล์ที่เป็นรูปภาพเท่านั้นครับ');
       e.target.value = '';
       return;
     }
@@ -48,7 +49,7 @@ const AccumulateShopCRUD = () => {
     // จำกัดขนาดไฟล์ที่ 2MB
     const limitSize = 2 * 1024 * 1024; // 2MB
     if (file.size > limitSize) {
-      alert('ขนาดรูปภาพใหญ่เกินไป! กรุณาเลือกภาพที่ขนาดไม่เกิน 2MB ครับ');
+      swalUtils.error('ไฟล์มีขนาดใหญ่เกินไป!', 'กรุณาเลือกภาพที่มีขนาดไม่เกิน 2MB ครับ');
       e.target.value = '';
       return;
     }
@@ -64,8 +65,17 @@ const AccumulateShopCRUD = () => {
     setForm(prev => ({ ...prev, image: '' }));
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('คุณแน่ใจที่จะลบของรางวัลยอดสะสมนี้ใช่หรือไม่?')) {
+  // ลบข้อมูลรางวัลด้วยปุ่มสีแดงสไตล์พรีเมียม (isDangerous)
+  const handleDelete = async (id) => {
+    const result = await swalUtils.confirm({
+      title: 'ต้องการลบของรางวัลใช่หรือไม่?',
+      text: 'เมื่อยืนยันแล้ว ข้อมูลของรางวัลชิ้นนี้จะถูกลบออกจากระบบทันที',
+      confirmButtonText: 'ยืนยันการลบข้อมูล',
+      cancelButtonText: 'ยกเลิก',
+      isDangerous: true
+    });
+
+    if (result.isConfirmed) {
       const updatedRewards = rewards.filter(r => r.id !== id);
       setRewards(updatedRewards);
       
@@ -73,41 +83,63 @@ const AccumulateShopCRUD = () => {
       if (currentPage > totalPagesAfterDelete && totalPagesAfterDelete > 0) {
         setCurrentPage(totalPagesAfterDelete);
       }
+      swalUtils.success('ลบข้อมูลสำเร็จ!', 'ได้ทำการลบรายการของรางวัลเรียบร้อยแล้ว');
     }
   };
 
-  const handleSubmit = (e) => {
+  // บันทึกข้อมูลของรางวัล โดยนำเสนอผ่านฟังก์ชัน previewConfirm ของเราโดยตรง
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // ตรวจสอบไม่ให้แต้มติดลบ
+    // ป้องกันแต้มติดลบ
     const pointsValue = Math.floor(Number(form.points));
     if (isNaN(pointsValue) || pointsValue < 0) {
-      alert('จำนวนแต้ม (Points) ต้องเป็นตัวเลขที่มีค่าตั้งแต่ 0 ขึ้นไปครับ!');
+      swalUtils.error('แต้มคะแนนไม่ถูกต้อง!', 'จำนวนแต้มต้องเป็นตัวเลขและมีค่าตั้งแต่ 0 ขึ้นไปครับ');
       return;
     }
 
+    const isEditMode = view === 'edit';
+    const titleText = isEditMode ? 'ตรวจสอบการแก้ไขของรางวัล' : 'ตรวจสอบข้อมูลของรางวัลใหม่';
+    const confirmBtnText = isEditMode ? 'ยืนยันอัปเดต' : 'ยืนยันบันทึก';
     const finalImage = form.image || defaultPic;
 
-    if (view === 'add') {
-      const newReward = {
-        id: rewards.length > 0 ? Math.max(...rewards.map(r => r.id)) + 1 : 1,
-        name: form.name.trim(),
-        points: pointsValue,
-        description: form.description.trim(),
-        image: finalImage
-      };
-      setRewards([...rewards, newReward]);
-    } else {
-      setRewards(rewards.map(r => r.id === form.id ? { 
-        ...r, 
-        name: form.name.trim(), 
-        points: pointsValue, 
-        description: form.description.trim(), 
-        image: finalImage
-      } : r));
+    // เรียกใช้ระบบพรีวิวร่วมของ swalUtils
+    const isConfirmed = await swalUtils.previewConfirm({
+      actionTitle: titleText,
+      image: finalImage,
+      confirmText: confirmBtnText,
+      cancelText: 'กลับไปแก้ไข',
+      fields: [
+        { label: 'ของรางวัล', value: form.name.trim() },
+        { label: 'รายละเอียด', value: form.description.trim() },
+        { label: 'ราคาแต้ม', value: `${pointsValue.toLocaleString()} Points`, isSpecial: true }
+      ]
+    });
+
+    if (isConfirmed) {
+      if (view === 'add') {
+        const newReward = {
+          id: rewards.length > 0 ? Math.max(...rewards.map(r => r.id)) + 1 : 1,
+          name: form.name.trim(),
+          points: pointsValue,
+          description: form.description.trim(),
+          image: finalImage
+        };
+        setRewards([...rewards, newReward]);
+        swalUtils.success('เพิ่มสำเร็จ!', `เพิ่มของรางวัล ${newReward.name} เรียบร้อยแล้ว`);
+      } else {
+        setRewards(rewards.map(r => r.id === form.id ? { 
+          ...r, 
+          name: form.name.trim(), 
+          points: pointsValue, 
+          description: form.description.trim(), 
+          image: finalImage
+        } : r));
+        swalUtils.success('อัปเดตสำเร็จ!', `อัปเดตของรางวัล ${form.name} เรียบร้อยแล้ว`);
+      }
+      setView('table');
+      setCurrentPage(1);
     }
-    setView('table');
-    setCurrentPage(1);
   };
 
   const filteredRewards = rewards.filter(r => 
@@ -124,7 +156,6 @@ const AccumulateShopCRUD = () => {
     setCurrentPage(pageNumber);
   };
 
-  // สกัดกั้นการพิมพ์เครื่องหมายลบ "-" และตัวอักษร "e" ป้องกันบั๊กฝั่ง input
   const handleKeyDown = (e) => {
     if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') {
       e.preventDefault();
@@ -151,7 +182,7 @@ const AccumulateShopCRUD = () => {
               />
               <button
                 onClick={handleOpenAdd}
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-500 rounded-full text-sm font-bold transition shrink-0 shadow-lg shadow-blue-600/20"
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-500 rounded-full text-sm font-bold transition shrink-0 shadow-lg shadow-blue-600/20 cursor-pointer"
               >
                 + Reward Item
               </button>
@@ -191,7 +222,7 @@ const AccumulateShopCRUD = () => {
                     <td className="p-4 text-center">
                       <button
                         onClick={() => handleOpenEdit(r)}
-                        className="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded-full transition shadow-md shadow-amber-500/10"
+                        className="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded-full transition shadow-md shadow-amber-500/10 cursor-pointer"
                       >
                         edit
                       </button>
@@ -199,7 +230,7 @@ const AccumulateShopCRUD = () => {
                     <td className="p-4 text-center">
                       <button
                         onClick={() => handleDelete(r.id)}
-                        className="px-4 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-full transition shadow-md shadow-rose-600/10"
+                        className="px-4 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-full transition shadow-md shadow-rose-600/10 cursor-pointer"
                       >
                         delete
                       </button>
@@ -226,7 +257,7 @@ const AccumulateShopCRUD = () => {
                 <button
                   disabled={currentPage === 1}
                   onClick={() => handlePageChange(currentPage - 1)}
-                  className="px-4 py-1.5 bg-[#121216] border border-purple-950/60 rounded-full text-xs font-bold text-purple-400 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-purple-950/20 transition"
+                  className="px-4 py-1.5 bg-[#121216] border border-purple-950/60 rounded-full text-xs font-bold text-purple-400 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-purple-950/20 transition cursor-pointer"
                 >
                   Prev
                 </button>
@@ -234,7 +265,7 @@ const AccumulateShopCRUD = () => {
                   <button
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${
                       currentPage === pageNum
                         ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20'
                         : 'bg-[#121216] border border-purple-950/60 text-gray-400 hover:text-purple-300'
@@ -246,7 +277,7 @@ const AccumulateShopCRUD = () => {
                 <button
                   disabled={currentPage === totalPages}
                   onClick={() => handlePageChange(currentPage + 1)}
-                  className="px-4 py-1.5 bg-[#121216] border border-purple-950/60 rounded-full text-xs font-bold text-purple-400 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-purple-950/20 transition"
+                  className="px-4 py-1.5 bg-[#121216] border border-purple-950/60 rounded-full text-xs font-bold text-purple-400 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-purple-950/20 transition cursor-pointer"
                 >
                   Next
                 </button>
@@ -338,7 +369,7 @@ const AccumulateShopCRUD = () => {
                       <button
                         type="button"
                         onClick={handleClearImage}
-                        className="text-[11px] text-rose-400 hover:text-rose-300 font-bold transition mt-1 underline"
+                        className="text-[11px] text-rose-400 hover:text-rose-300 font-bold transition mt-1 underline cursor-pointer"
                       >
                         Remove Image
                       </button>
@@ -351,14 +382,14 @@ const AccumulateShopCRUD = () => {
             <div className="flex items-center space-x-3 pt-4 sm:pl-32">
               <button
                 type="submit"
-                className="px-8 py-2.5 rounded-full font-bold text-white bg-blue-600 hover:bg-blue-500 transition duration-300 shadow-md shadow-blue-600/20"
+                className="px-8 py-2.5 rounded-full font-bold text-white bg-blue-600 hover:bg-blue-500 transition duration-300 shadow-md shadow-blue-600/20 cursor-pointer"
               >
                 {view === 'add' ? 'Insert Reward' : 'Update'}
               </button>
               <button
                 type="button"
                 onClick={() => setView('table')}
-                className="px-8 py-2.5 rounded-full font-bold text-white bg-rose-600 hover:bg-rose-500 transition duration-300 shadow-md shadow-rose-600/20"
+                className="px-8 py-2.5 rounded-full font-bold text-white bg-rose-600 hover:bg-rose-500 transition duration-300 shadow-md shadow-rose-600/20 cursor-pointer"
               >
                 cancel
               </button>

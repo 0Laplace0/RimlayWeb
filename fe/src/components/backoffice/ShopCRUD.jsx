@@ -1,18 +1,19 @@
 import { useState } from 'react';
+import { swalUtils } from '../../utils/swalUtils';
 
 const ShopCRUD = () => {
   const [products, setProducts] = useState([
-    { id: 1, name: 'Premium Salmon Cat Food', price: '450', description: 'อาหารแมวแซลมอนสูตรพรีเมียม', image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=150&q=80' },
-    { id: 2, name: 'Wireless Cat Toy Ball', price: '290', description: 'ลูกบอลของเล่นแมวไร้สายอัจฉริยะ', image: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=150&q=80' },
-    { id: 3, name: 'Tuna Jelly Treat', price: '120', description: 'ขนมแมวเลียรสทูน่าเจลลี่รสชาติเข้มข้น', image: 'https://images.unsplash.com/photo-1569591159212-b02ea8a9f239?auto=format&fit=crop&w=150&q=80' },
-    { id: 4, name: 'Soft Velvet Collar', price: '180', description: 'ปลอกคอผ้ากำมะหยี่นุ่มๆ พร้อมกระดิ่ง', image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=150&q=80' },
-    { id: 5, name: 'Cat Fountain Waterer', price: '690', description: 'น้ำพุแมวอัจฉริยะกรองน้ำระบบ 3 ชั้น', image: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80' },
-    { id: 6, name: 'Cardboard Cat Scratcher', price: '150', description: 'ที่ฝนเล็บแมวกระดาษลูกฟูกทรงคลื่น', image: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=150&q=80' },
-    { id: 7, name: 'Organic Catnip Grass', price: '99', description: 'ต้นอ่อนข้าวสาลีออร์แกนิกชุดปลูกเอง', image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=150&q=80' },
-    { id: 8, name: 'Warm Sleeping Bed', price: '520', description: 'ที่นอนโดมแมวบุขนแกะนุ่มอบอุ่น', image: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80' },
-    { id: 9, name: 'Portable Cat Carrier Bag', price: '890', description: 'กระเป๋าเป้อวกาศสะพายหลังพาน้องเที่ยว', image: 'https://images.unsplash.com/photo-1569591159212-b02ea8a9f239?auto=format&fit=crop&w=150&q=80' },
-    { id: 10, name: 'Automatic Cat Feeder', price: '1590', description: 'เครื่องให้อาหารอัตโนมัติตั้งเวลาผ่านแอป', image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=150&q=80' },
-    { id: 11, name: 'Laser Pointer Toy', price: '120', description: 'ปากกาเลเซอร์สีแดงขนาดพกพาแถมถ่าน', image: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=150&q=80' }
+    { id: 1, name: 'Premium Salmon Cat Food', price: 450, description: 'อาหารแมวแซลมอนสูตรพรีเมียม', image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=150&q=80' },
+    { id: 2, name: 'Wireless Cat Toy Ball', price: 290, description: 'ลูกบอลของเล่นแมวไร้สายอัจฉริยะ', image: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=150&q=80' },
+    { id: 3, name: 'Tuna Jelly Treat', price: 120, description: 'ขนมแมวเลียรสทูน่าเจลลี่รสชาติเข้มข้น', image: 'https://images.unsplash.com/photo-1569591159212-b02ea8a9f239?auto=format&fit=crop&w=150&q=80' },
+    { id: 4, name: 'Soft Velvet Collar', price: 180, description: 'ปลอกคอผ้ากำมะหยี่นุ่มๆ พร้อมกระดิ่ง', image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=150&q=80' },
+    { id: 5, name: 'Cat Fountain Waterer', price: 690, description: 'น้ำพุแมวอัจฉริยะกรองน้ำระบบ 3 ชั้น', image: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80' },
+    { id: 6, name: 'Cardboard Cat Scratcher', price: 150, description: 'ที่ฝนเล็บแมวกระดาษลูกฟูกทรงคลื่น', image: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=150&q=80' },
+    { id: 7, name: 'Organic Catnip Grass', price: 99, description: 'ต้นอ่อนข้าวสาลีออร์แกนิกชุดปลูกเอง', image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=150&q=80' },
+    { id: 8, name: 'Warm Sleeping Bed', price: 520, description: 'ที่นอนโดมแมวบุขนแกะนุ่มอบอุ่น', image: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80' },
+    { id: 9, name: 'Portable Cat Carrier Bag', price: 890, description: 'กระเป๋าเป้อวกาศสะพายหลังพาน้องเที่ยว', image: 'https://images.unsplash.com/photo-1569591159212-b02ea8a9f239?auto=format&fit=crop&w=150&q=80' },
+    { id: 10, name: 'Automatic Cat Feeder', price: 1590, description: 'เครื่องให้อาหารอัตโนมัติตั้งเวลาผ่านแอป', image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=150&q=80' },
+    { id: 11, name: 'Laser Pointer Toy', price: 120, description: 'ปากกาเลเซอร์สีแดงขนาดพกพาแถมถ่าน', image: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=150&q=80' }
   ]);
 
   const [view, setView] = useState('table');
@@ -22,6 +23,11 @@ const ShopCRUD = () => {
   const itemsPerPage = 10;
 
   const defaultPic = 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80';
+
+  const filteredProducts = products.filter(p => 
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleOpenAdd = () => {
     setForm({ id: null, name: '', price: '', description: '', image: '' });
@@ -33,13 +39,27 @@ const ShopCRUD = () => {
     setView('edit');
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('คุณแน่ใจที่จะลบสินค้านี้ใช่หรือไม่?')) {
-      setProducts(products.filter(p => p.id !== id));
+  const handleDelete = async (item) => {
+    const result = await swalUtils.confirm({
+      title: 'ต้องการลบสินค้าใช่หรือไม่?',
+      text: `เมื่อยืนยันแล้ว ข้อมูลของรางวัล "${item.name}" จะถูกลบออกจากระบบทันที`,
+      confirmButtonText: 'ยืนยันการลบข้อมูล',
+      cancelButtonText: 'ยกเลิก',
+      isDangerous: true
+    });
+
+    if (result.isConfirmed) {
+      const updatedProducts = products.filter(p => p.id !== item.id);
+      setProducts(updatedProducts);
+      
+      const totalPagesAfterDelete = Math.ceil(updatedProducts.length / itemsPerPage);
+      if (currentPage > totalPagesAfterDelete && totalPagesAfterDelete > 0) {
+        setCurrentPage(totalPagesAfterDelete);
+      }
+      swalUtils.success('ลบข้อมูลสำเร็จ!', `ได้ทำการลบรายการของรางวัล "${item.name}" เรียบร้อยแล้ว`);
     }
   };
 
-  // ฟังก์ชันแปลงไฟล์รูปภาพเป็น Base64
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -51,11 +71,26 @@ const ShopCRUD = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // ตรวจสอบและป้องกันราคาติดลบ
-    const sanitizedPrice = Math.max(0, Number(form.price)).toString();
+    const sanitizedPrice = Math.max(0, Number(form.price));
+    const actionTitle = view === 'add' ? 'ตรวจสอบการเพิ่มข้อมูลสินค้า' : 'ตรวจสอบการแก้ไขข้อมูลสินค้า';
+    const productImage = form.image || defaultPic;
+
+    const isConfirmed = await swalUtils.previewConfirm({
+      actionTitle,
+      image: productImage,
+      fields: [
+        { label: 'ชื่อสินค้า', value: form.name },
+        { label: 'รายละเอียด', value: form.description },
+        { label: 'ราคาสินค้า', value: `${sanitizedPrice.toLocaleString()} Cash`, isSpecial: true }
+      ],
+      confirmText: view === 'add' ? 'ยืนยันเพิ่มสินค้า' : 'ยืนยันอัปเดต',
+      cancelText: 'กลับไปแก้ไข'
+    });
+
+    if (!isConfirmed) return;
 
     if (view === 'add') {
       const newItem = {
@@ -66,6 +101,7 @@ const ShopCRUD = () => {
         image: form.image || defaultPic
       };
       setProducts([...products, newItem]);
+      swalUtils.success('เพิ่มสินค้าใหม่สำเร็จแล้ว!');
     } else {
       setProducts(products.map(p => p.id === form.id ? { 
         ...p, 
@@ -74,14 +110,10 @@ const ShopCRUD = () => {
         description: form.description, 
         image: form.image || p.image || defaultPic 
       } : p));
+      swalUtils.success('อัปเดตข้อมูลสินค้าสำเร็จแล้ว!');
     }
     setView('table');
   };
-
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -147,7 +179,9 @@ const ShopCRUD = () => {
                     <td className="p-4 font-semibold text-white">
                       {p.name} <span className="text-xs text-gray-500 font-normal ml-3">({p.description})</span>
                     </td>
-                    <td className="p-4 text-emerald-400 font-bold">{p.price} Cash</td>
+                    <td className="p-4 text-emerald-400 font-bold">
+                      {Number(p.price).toLocaleString()} Cash
+                    </td>
                     <td className="p-4 text-center">
                       <button
                         onClick={() => handleOpenEdit(p)}
@@ -158,8 +192,8 @@ const ShopCRUD = () => {
                     </td>
                     <td className="p-4 text-center">
                       <button
-                        onClick={() => handleDelete(p.id)}
-                        className="px-4 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-full transition shadow-md shadow-rose-600/10"
+                        onClick={() => handleDelete(p)}
+                        className="px-4 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-full transition shadow-md shadow-rose-600/10 cursor-pointer"
                       >
                         delete
                       </button>
