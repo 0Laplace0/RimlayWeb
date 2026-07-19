@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import UserDetailModal from './UserDetailModal';
-import { swalUtils } from '../../utils/swalUtils';
+import { swalUtils } from '../../utils/swalUtils.js';
 
 const CustomerCRUD = () => {
   // State สำหรับควบคุม Pop-up รายละเอียด

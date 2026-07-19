@@ -2,12 +2,15 @@ import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import ProductGrid from '../components/ProductGrid';
 import ItemDetailModal from '../components/ItemDetailModal';
-import { swalUtils } from '../utils/swalUtils';
+import { swalUtils } from '../utils/swalUtils.js';
+import { useCart } from '../context/CartContext.jsx';
 
 const Shop = () => {
   // State คุมการเปิดปิดและเลือกสินค้าเพื่อแสดงผลใน Pop-up
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { addToCart } = useCart();
 
   // สร้างสินค้าจำลองสำหรับหน้าร้านค้าหลักทั่วไป
   const shopProducts = Array.from({ length: 25 }, (_, index) => ({
@@ -24,26 +27,17 @@ const Shop = () => {
     setIsModalOpen(true);
   };
 
-  // ฟังก์ชันกดยืนยันสั่งซื้อแบบพรีเมียม
-  const handleBuy = async (product) => {
-    // ปิด Modal รายละเอียดก่อนเพื่อไม่ให้ทับซ้อนกัน
+  // ฟังก์ชัน "เพิ่มลงตะกร้า"
+  const handleAddToCart = (product) => {
     setIsModalOpen(false);
 
-    // แสดงกล่องยืนยันการซื้อสินค้า
-    const result = await swalUtils.confirm({
-      title: 'ยืนยันการสั่งซื้อสินค้า?',
-      text: `คุณกำลังจะซื้อสินค้า "${product.name}" ในราคา ${product.price.toLocaleString()} Cash`,
-      confirmButtonText: 'ยืนยันการซื้อ',
-      cancelButtonText: 'ยกเลิก',
-    });
+    addToCart(product);
 
-    // หากผู้ใช้งานกดยืนยัน
-    if (result.isConfirmed) {
-      swalUtils.success(
-        'สั่งซื้อสำเร็จ!',
-        `คุณได้ซื้อ "${product.name}" เรียบร้อยแล้ว (หักเงิน ${product.price.toLocaleString()} Cash)`
-      );
-    }
+    // แจ้งเตือนความสำเร็จ
+    swalUtils.success(
+      'เพิ่มลงตะกร้าแล้ว!', 
+      `"${product.name}" ถูกเพิ่มในตะกร้าของคุณเรียบร้อยแล้ว`
+    );
   };
 
   return (
@@ -69,7 +63,7 @@ const Shop = () => {
         onClose={() => setIsModalOpen(false)}
         product={selectedProduct}
         priceUnit="Cash"
-        onBuy={handleBuy}
+        onBuy={handleAddToCart}
       />
     </div>
   );

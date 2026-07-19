@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { swalUtils } from '../../utils/swalUtils';
+import { swalUtils } from '../../utils/swalUtils.js';
 
 const AccumulateShopCRUD = () => {
   const [rewards, setRewards] = useState([

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { swalUtils } from '../../utils/swalUtils';
+import { swalUtils } from '../../utils/swalUtils.js';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
