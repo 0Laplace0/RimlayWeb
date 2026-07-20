@@ -14,7 +14,6 @@ export const swalUtils = {
     const cancelButtonText = isObject ? (optionsOrTitle.cancelButtonText || 'ยกเลิก') : 'ยกเลิก';
     const isDangerous = isObject ? optionsOrTitle.isDangerous : false;
 
-    // เลือกใช้สีพื้นหลังตามสถานะความอันตราย (Dangerous)
     const confirmBtnBg = isDangerous ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-500 hover:bg-emerald-600';
 
     const result = await Swal.fire({
@@ -26,9 +25,7 @@ export const swalUtils = {
       showCancelButton: true,
       confirmButtonText: confirmButtonText,
       cancelButtonText: cancelButtonText,
-      
       buttonsStyling: false, 
-      
       customClass: {
         popup: 'border border-purple-950/60 rounded-[2rem]',
         confirmButton: `px-8 py-2.5 rounded-full font-bold text-sm mx-1.5 text-white focus:outline-none transition-all duration-200 hover:scale-105 cursor-pointer ${confirmBtnBg}`,
@@ -63,9 +60,7 @@ export const swalUtils = {
       html: text ? `<span style="color: #9ca3af; font-size: 14px;">${text}</span>` : undefined,
       background: '#090514',
       confirmButtonText: 'รับทราบ',
-      
       buttonsStyling: false,
-      
       iconColor: '#dc2626',
       customClass: {
         popup: 'border border-purple-950/60 rounded-[2rem]',
@@ -77,7 +72,6 @@ export const swalUtils = {
   // 4. ฟังก์ชันพรีวิวข้อมูล (Recheck)
   previewConfirm: async ({ actionTitle, image, fields, confirmText, cancelText }) => {
     const fieldsHtml = fields.map(field => {
-      // ถ้าไม่มี label ให้แสดงเฉพาะ value
       if (!field.label) {
         return `
           <div style="margin-bottom:12px;">
@@ -91,12 +85,7 @@ export const swalUtils = {
           <span style="color:#a78bfa;font-weight:bold;width:110px;flex-shrink:0;">
             ${field.label}
           </span>
-
-          <span style="${
-            field.isSpecial
-              ? 'color:#10b981;font-weight:bold;'
-              : 'color:#ffffff;'
-          }word-break:break-all;">
+          <span style="${field.isSpecial ? 'color:#10b981;font-weight:bold;' : 'color:#ffffff;'}word-break:break-all;">
             ${field.value}
           </span>
         </div>
@@ -105,7 +94,6 @@ export const swalUtils = {
 
     const result = await Swal.fire({
       title: `<span style="color:#fff;font-size:22px;font-weight:bold;">${actionTitle}</span>`,
-
       html: `
         <div style="
           display:flex;
@@ -114,7 +102,6 @@ export const swalUtils = {
           font-family:sans-serif;
           margin-top:10px;
         ">
-
           ${
             image
               ? `
@@ -141,7 +128,7 @@ export const swalUtils = {
             border-radius:18px;
             padding:22px;
             width:100%;
-            max-width:420px;
+            max-width:650px;
             text-align:left;
           ">
             ${fieldsHtml}
@@ -154,23 +141,19 @@ export const swalUtils = {
           ">
             กรุณาตรวจสอบข้อมูลด้านบนให้ถูกต้องก่อนกดยืนยัน
           </p>
-
         </div>
       `,
-
       background: '#090514',
       showCancelButton: true,
       confirmButtonText: confirmText || 'ยืนยัน',
       cancelButtonText: cancelText || 'ยกเลิก',
-
       buttonsStyling: false,
-
       customClass: {
         popup: 'border border-purple-950/60 rounded-[2.2rem]',
         confirmButton:
-          'px-8 py-2.5 rounded-full font-bold text-sm mx-1.5 text-white bg-emerald-500 hover:bg-emerald-600',
+          'px-8 py-2.5 rounded-full font-bold text-sm mx-1.5 text-white bg-red-600 hover:bg-red-700 transition-all duration-200 cursor-pointer',
         cancelButton:
-          'px-8 py-2.5 rounded-full font-bold text-sm mx-1.5 text-white bg-gray-700 hover:bg-gray-600'
+          'px-8 py-2.5 rounded-full font-bold text-sm mx-1.5 text-white bg-gray-700 hover:bg-gray-600 transition-all duration-200 cursor-pointer'
       }
     });
 

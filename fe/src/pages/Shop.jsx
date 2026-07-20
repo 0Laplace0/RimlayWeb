@@ -26,11 +26,14 @@ const Shop = () => {
 
   const handleAddToCart = (product) => {
     setIsModalOpen(false);
-    addToCart(product);
-    swalUtils.success(
-      'เพิ่มลงตะกร้าแล้ว!', 
-      `"${product.name}" ถูกเพิ่มในตะกร้าของคุณเรียบร้อยแล้ว`
-    );
+    const isSuccess = addToCart(product, product.quantity || 1, 'Cash');
+    
+    if (isSuccess) {
+      swalUtils.success(
+        'เพิ่มลงตะกร้าแล้ว!', 
+        `"${product.name}" จำนวน ${product.quantity || 1} ชิ้น ถูกเพิ่มในตะกร้าของคุณเรียบร้อยแล้ว`
+      );
+    }
   };
 
   return (

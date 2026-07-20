@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import ProductGrid from '../components/ProductGrid';
 import ItemDetailModal from '../components/ItemDetailModal';
-import CartFloatButton from '../components/CartFloatButton';
 import { swalUtils } from '../utils/swalUtils.js';
 import { useCart } from '../context/CartContext.jsx';
 
@@ -42,11 +41,16 @@ const Home = () => {
 
   const handleAddToCart = (product) => {
     setIsModalOpen(false);
-    addToCart(product, product.quantity || 1);
-    swalUtils.success(
-      'เพิ่มลงตะกร้าแล้ว!', 
-      `"${product.name}" จำนวน ${product.quantity || 1} ชิ้น ถูกเพิ่มในตะกร้าของคุณเรียบร้อยแล้ว`
-    );
+    
+    const currency = activeTab === 'shop' ? 'Cash' : 'Points';
+    const isSuccess = addToCart(product, product.quantity || 1, currency);
+    
+    if (isSuccess) {
+      swalUtils.success(
+        'เพิ่มลงตะกร้าแล้ว!', 
+        `"${product.name}" จำนวน ${product.quantity || 1} ชิ้น ถูกเพิ่มในตะกร้าของคุณเรียบร้อยแล้ว`
+      );
+    }
   };
 
   const handleMore = () => {
@@ -56,7 +60,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-[#0d0d11] text-white flex flex-col w-full relative">
       <Navbar />
-      <CartFloatButton />
+      {/* ❌ ลบ <CartFloatButton /> ตรงนี้ออก */}
 
       <div className="flex-1 max-w-6xl w-full mx-auto px-4 py-8 flex flex-col items-center">
         
@@ -78,7 +82,7 @@ const Home = () => {
             </button>
         </div>
 
-        {/* PRODUCT GRID (แสดงเฉพาะรายการสินค้า 2 แถว ไม่มี Header แต่อย่างใด) */}
+        {/* PRODUCT GRID */}
         <div className="w-full max-w-[1000px]">
           <ProductGrid 
             products={currentList} 
