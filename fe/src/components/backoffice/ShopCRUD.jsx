@@ -3,21 +3,21 @@ import { swalUtils } from '../../utils/swalUtils.js';
 
 const ShopCRUD = () => {
   const [products, setProducts] = useState([
-    { id: 1, name: 'Premium Salmon Cat Food', price: 450, description: 'อาหารแมวแซลมอนสูตรพรีเมียม', image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=150&q=80' },
-    { id: 2, name: 'Wireless Cat Toy Ball', price: 290, description: 'ลูกบอลของเล่นแมวไร้สายอัจฉริยะ', image: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=150&q=80' },
-    { id: 3, name: 'Tuna Jelly Treat', price: 120, description: 'ขนมแมวเลียรสทูน่าเจลลี่รสชาติเข้มข้น', image: 'https://images.unsplash.com/photo-1569591159212-b02ea8a9f239?auto=format&fit=crop&w=150&q=80' },
-    { id: 4, name: 'Soft Velvet Collar', price: 180, description: 'ปลอกคอผ้ากำมะหยี่นุ่มๆ พร้อมกระดิ่ง', image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=150&q=80' },
-    { id: 5, name: 'Cat Fountain Waterer', price: 690, description: 'น้ำพุแมวอัจฉริยะกรองน้ำระบบ 3 ชั้น', image: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80' },
-    { id: 6, name: 'Cardboard Cat Scratcher', price: 150, description: 'ที่ฝนเล็บแมวกระดาษลูกฟูกทรงคลื่น', image: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=150&q=80' },
-    { id: 7, name: 'Organic Catnip Grass', price: 99, description: 'ต้นอ่อนข้าวสาลีออร์แกนิกชุดปลูกเอง', image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=150&q=80' },
-    { id: 8, name: 'Warm Sleeping Bed', price: 520, description: 'ที่นอนโดมแมวบุขนแกะนุ่มอบอุ่น', image: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80' },
-    { id: 9, name: 'Portable Cat Carrier Bag', price: 890, description: 'กระเป๋าเป้อวกาศสะพายหลังพาน้องเที่ยว', image: 'https://images.unsplash.com/photo-1569591159212-b02ea8a9f239?auto=format&fit=crop&w=150&q=80' },
-    { id: 10, name: 'Automatic Cat Feeder', price: 1590, description: 'เครื่องให้อาหารอัตโนมัติตั้งเวลาผ่านแอป', image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=150&q=80' },
-    { id: 11, name: 'Laser Pointer Toy', price: 120, description: 'ปากกาเลเซอร์สีแดงขนาดพกพาแถมถ่าน', image: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=150&q=80' }
+    { id: 1, name: 'Premium Salmon Cat Food', category: 'Food', price: 450, description: 'อาหารแมวแซลมอนสูตรพรีเมียม', image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=150&q=80' },
+    { id: 2, name: 'Wireless Cat Toy Ball', category: 'Toy', price: 290, description: 'ลูกบอลของเล่นแมวไร้สายอัจฉริยะ', image: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=150&q=80' },
+    { id: 3, name: 'Tuna Jelly Treat', category: 'Food', price: 120, description: 'ขนมแมวเลียรสทูน่าเจลลี่รสชาติเข้มข้น', image: 'https://images.unsplash.com/photo-1569591159212-b02ea8a9f239?auto=format&fit=crop&w=150&q=80' },
+    { id: 4, name: 'Soft Velvet Collar', category: 'Accessory', price: 180, description: 'ปลอกคอผ้ากำมะหยี่นุ่มๆ พร้อมกระดิ่ง', image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=150&q=80' },
+    { id: 5, name: 'Cat Fountain Waterer', category: 'Gadget', price: 690, description: 'น้ำพุแมวอัจฉริยะกรองน้ำระบบ 3 ชั้น', image: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80' },
+    { id: 6, name: 'Cardboard Cat Scratcher', category: 'Toy', price: 150, description: 'ที่ฝนเล็บแมวกระดาษลูกฟูกทรงคลื่น', image: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=150&q=80' },
+    { id: 7, name: 'Organic Catnip Grass', category: 'Food', price: 99, description: 'ต้นอ่อนข้าวสาลีออร์แกนิกชุดปลูกเอง', image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=150&q=80' },
+    { id: 8, name: 'Warm Sleeping Bed', category: 'Accessory', price: 520, description: 'ที่นอนโดมแมวบุขนแกะนุ่มอบอุ่น', image: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80' },
+    { id: 9, name: 'Portable Cat Carrier Bag', category: 'Accessory', price: 890, description: 'กระเป๋าเป้อวกาศสะพายหลังพาน้องเที่ยว', image: 'https://images.unsplash.com/photo-1569591159212-b02ea8a9f239?auto=format&fit=crop&w=150&q=80' },
+    { id: 10, name: 'Automatic Cat Feeder', category: 'Gadget', price: 1590, description: 'เครื่องให้อาหารอัตโนมัติตั้งเวลาผ่านแอป', image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=150&q=80' },
+    { id: 11, name: 'Laser Pointer Toy', category: 'Toy', price: 120, description: 'ปากกาเลเซอร์สีแดงขนาดพกพาแถมถ่าน', image: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=150&q=80' }
   ]);
 
   const [view, setView] = useState('table');
-  const [form, setForm] = useState({ id: null, name: '', price: '', description: '', image: '' });
+  const [form, setForm] = useState({ id: null, name: '', category: '', price: '', description: '', image: '' });
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -26,16 +26,17 @@ const ShopCRUD = () => {
 
   const filteredProducts = products.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleOpenAdd = () => {
-    setForm({ id: null, name: '', price: '', description: '', image: '' });
+    setForm({ id: null, name: '', category: '', price: '', description: '', image: '' });
     setView('add');
   };
 
   const handleOpenEdit = (item) => {
-    setForm({ id: item.id, name: item.name, price: item.price, description: item.description, image: item.image || '' });
+    setForm({ id: item.id, name: item.name, category: item.category || '', price: item.price, description: item.description, image: item.image || '' });
     setView('edit');
   };
 
@@ -83,6 +84,7 @@ const ShopCRUD = () => {
       image: productImage,
       fields: [
         { label: 'ชื่อสินค้า', value: form.name },
+        { label: 'ประเภท (Category)', value: form.category },
         { label: 'รายละเอียด', value: form.description },
         { label: 'ราคาสินค้า', value: `${sanitizedPrice.toLocaleString()} Cash`, isSpecial: true }
       ],
@@ -96,6 +98,7 @@ const ShopCRUD = () => {
       const newItem = {
         id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
         name: form.name,
+        category: form.category,
         price: sanitizedPrice,
         description: form.description,
         image: form.image || defaultPic
@@ -106,6 +109,7 @@ const ShopCRUD = () => {
       setProducts(products.map(p => p.id === form.id ? { 
         ...p, 
         name: form.name, 
+        category: form.category,
         price: sanitizedPrice, 
         description: form.description, 
         image: form.image || p.image || defaultPic 
@@ -158,6 +162,7 @@ const ShopCRUD = () => {
                   <th className="p-4 text-center w-16">No.</th>
                   <th className="p-4 text-center w-20">Pic</th>
                   <th className="p-4">Product Name</th>
+                  <th className="p-4">Category</th>
                   <th className="p-4">Price (Cash)</th>
                   <th className="p-4 text-center w-24">edit</th>
                   <th className="p-4 text-center w-24">delete</th>
@@ -178,6 +183,9 @@ const ShopCRUD = () => {
                     </td>
                     <td className="p-4 font-semibold text-white">
                       {p.name} <span className="text-xs text-gray-500 font-normal ml-3">({p.description})</span>
+                    </td>
+                    <td className="p-4 text-purple-200">
+                      <span className="px-2 py-1 bg-purple-900/40 rounded-md text-xs">{p.category}</span>
                     </td>
                     <td className="p-4 text-emerald-400 font-bold">
                       {Number(p.price).toLocaleString()} Cash
@@ -202,7 +210,7 @@ const ShopCRUD = () => {
                 ))}
                 {currentItems.length === 0 && (
                   <tr>
-                    <td colSpan="6" className="text-center p-8 text-gray-500">
+                    <td colSpan="7" className="text-center p-8 text-gray-500">
                       ไม่พบข้อมูลสินค้าที่ต้องการค้นหา
                     </td>
                   </tr>
@@ -269,6 +277,18 @@ const ShopCRUD = () => {
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Product Name"
+                className="flex-1 px-4 py-2 rounded-full bg-[#121216] border border-purple-950/60 focus:outline-none focus:border-purple-500 text-white"
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center">
+              <label className="sm:w-32 text-gray-400 font-semibold mb-1">Category</label>
+              <input
+                type="text"
+                required
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                placeholder="e.g. Food, Toy, Accessory"
                 className="flex-1 px-4 py-2 rounded-full bg-[#121216] border border-purple-950/60 focus:outline-none focus:border-purple-500 text-white"
               />
             </div>

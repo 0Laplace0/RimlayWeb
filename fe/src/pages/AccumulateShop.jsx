@@ -1,23 +1,40 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Navbar from '../components/Navbar';
 import ProductGrid from '../components/ProductGrid';
 import ItemDetailModal from '../components/ItemDetailModal';
 import { swalUtils } from '../utils/swalUtils.js';
 import { useCart } from '../context/CartContext.jsx';
 
-export const accumulateProducts = Array.from({ length: 22 }, (_, index) => ({
-  id: `acc-${index + 1}`,
-  name: `Accumulated Reward ${index + 1}`,
-  price: (index + 1) * 100,
-  image: "https://placehold.co/300x300/121214/06b6d4?text=Reward",
-  description: `ไอเท็มระดับรางวัลพิเศษของสะสมชิ้นที่ ${index + 1} แลกรับสิทธิ์ได้เฉพาะผู้ที่มีคะแนนสะสมครบตามที่กำหนดเท่านั้น เป็นลิมิเต็ดเอดิชันเฉพาะซีซันนี้`,
-}));
+// เพิ่มฟิลด์ category ลงใน Mock Data
+export const accumulateProducts = [
+  { id: 'acc-1', name: 'Golden Cat Condo', category: 'Furniture', price: 1200, image: "https://placehold.co/300x300/121214/06b6d4?text=Condo", description: 'คอนโดแมวพรีเมียมลิมิเต็ดเอดิชันสำหรับทาสผู้มีคะแนนสะสมสูงสุด' },
+  { id: 'acc-2', name: 'Cosplay Wing Wings', category: 'Costume', price: 450, image: "https://placehold.co/300x300/121214/06b6d4?text=Wings", description: 'ปีกคอสเพลย์แฟนซีสำหรับสัตว์เลี้ยง' },
+  { id: 'acc-3', name: 'Cat Fountain Gold', category: 'Gadget', price: 800, image: "https://placehold.co/300x300/121214/06b6d4?text=Fountain", description: 'น้ำพุแมวอัจฉริยะประดับขอบสีทองสวยงาม' },
+  { id: 'acc-4', name: 'Royal Cat Crown', category: 'Costume', price: 300, image: "https://placehold.co/300x300/121214/06b6d4?text=Crown", description: 'มงกุฎเจ้าชายเจ้าหญิงสุดน่ารัก' },
+  { id: 'acc-5', name: 'Heated Cat Mat', category: 'Furniture', price: 600, image: "https://placehold.co/300x300/121214/06b6d4?text=Bed", description: 'เบาะนอนปรับอุณหภูมิอุ่นนุ่มสบาย' },
+  { id: 'acc-6', name: 'Laser Collar Toy', category: 'Toy', price: 550, image: "https://placehold.co/300x300/121214/06b6d4?text=Toy", description: 'ปลอกคอปล่อยแสงเลเซอร์อัตโนมัติ' },
+];
 
 const AccumulateShop = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('All');
   
   const { addToCart } = useCart();
+
+  // 1. ดึงหมวดหมู่ที่ไม่ซ้ำกันจากรายการสินค้าแลกแต้มที่มีอยู่จริง ( Dynamic จาก CRUD )
+  const categories = useMemo(() => {
+    const uniqueCats = Array.from(
+      new Set(accumulateProducts.map(item => item.category).filter(Boolean))
+    );
+    return ['All', ...uniqueCats];
+  }, [accumulateProducts]);
+
+  // 2. กรองสินค้าตาม Category ที่เลือก
+  const filteredProducts = useMemo(() => {
+    if (selectedCategory === 'All') return accumulateProducts;
+    return accumulateProducts.filter(item => item.category === selectedCategory);
+  }, [selectedCategory]);
 
   const handleItemClick = (product) => {
     setSelectedProduct(product);
@@ -58,8 +75,29 @@ const AccumulateShop = () => {
             </div>
           </div>
 
+          {/* 🎯 Category Filter Bar (โทนสีฟ้าตามธีม Accumulate Shop) */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-6 no-scrollbar">
+            {categories.map((cat) => {
+              const isActive = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 shrink-0 border ${
+                    isActive
+                      ? 'bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-600/30'
+                      : 'bg-[#121216] text-gray-400 border-blue-950/60 hover:text-blue-300 hover:border-blue-800'
+                  }`}
+                >
+                  {cat === 'All' ? 'ทั้งหมด (All)' : cat}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Product Grid */}
           <ProductGrid 
-            products={accumulateProducts} 
+            products={filteredProducts} 
             cols={4} 
             rows={5} 
             priceUnit="Points"
