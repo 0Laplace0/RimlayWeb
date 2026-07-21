@@ -5,7 +5,6 @@ import ItemDetailModal from '../components/ItemDetailModal';
 import { swalUtils } from '../utils/swalUtils.js';
 import { useCart } from '../context/CartContext.jsx';
 
-// เพิ่มฟิลด์ category ลงใน Mock Data
 export const accumulateProducts = [
   { id: 'acc-1', name: 'Golden Cat Condo', category: 'Furniture', price: 1200, image: "https://placehold.co/300x300/121214/06b6d4?text=Condo", description: 'คอนโดแมวพรีเมียมลิมิเต็ดเอดิชันสำหรับทาสผู้มีคะแนนสะสมสูงสุด' },
   { id: 'acc-2', name: 'Cosplay Wing Wings', category: 'Costume', price: 450, image: "https://placehold.co/300x300/121214/06b6d4?text=Wings", description: 'ปีกคอสเพลย์แฟนซีสำหรับสัตว์เลี้ยง' },

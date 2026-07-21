@@ -5,6 +5,7 @@ import CarouselCRUD from '../components/backoffice/CarouselCRUD';
 import CustomerCRUD from '../components/backoffice/CustomerCRUD';
 import ShopCRUD from '../components/backoffice/ShopCRUD';
 import AccumulateShopCRUD from '../components/backoffice/AccumulateShopCRUD';
+import ActivityLog from '../components/backoffice/ActivityLog'; // 👈 นำเข้า Realtime Activity Log
 import Dashboard from '../components/backoffice/Dashboard'; 
 
 const Backoffice = () => {
@@ -16,6 +17,7 @@ const Backoffice = () => {
     { id: 'CustomerCRUD', name: '- CustomerCRUD -' },
     { id: 'ShopCRUD', name: '- ร้านค้าทั่วไป (Cash) -' },
     { id: 'AccumulateShopCRUD', name: '- ร้านค้ายอดสะสม (Points) -' },
+    { id: 'ActivityLog', name: '- Realtime Activity Log -' },
   ];
 
   const renderContent = () => {
@@ -30,6 +32,8 @@ const Backoffice = () => {
         return <ShopCRUD />;
       case 'AccumulateShopCRUD':
         return <AccumulateShopCRUD />;
+      case 'ActivityLog':
+        return <ActivityLog />;
       default:
         return (
           <div className="text-center py-24 text-gray-500">
