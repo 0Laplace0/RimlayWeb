@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
+import { swalUtils } from '../utils/swalUtils.js';
 
 import CarouselCRUD from '../components/backoffice/CarouselCRUD';
 import CustomerCRUD from '../components/backoffice/CustomerCRUD';
 import ShopCRUD from '../components/backoffice/ShopCRUD';
 import AccumulateShopCRUD from '../components/backoffice/AccumulateShopCRUD';
-import ActivityLog from '../components/backoffice/ActivityLog'; // 👈 นำเข้า Realtime Activity Log
+import ActivityLog from '../components/backoffice/ActivityLog'; 
 import Dashboard from '../components/backoffice/Dashboard'; 
 
 const Backoffice = () => {
@@ -19,6 +20,23 @@ const Backoffice = () => {
     { id: 'AccumulateShopCRUD', name: '- ร้านค้ายอดสะสม (Points) -' },
     { id: 'ActivityLog', name: '- Realtime Activity Log -' },
   ];
+
+  // ฟังก์ชันการออกจากระบบด้วย swalUtils
+  const handleLogout = async () => {
+    // กรณี swalUtils มีฟังก์ชัน confirm
+    if (swalUtils.confirm) {
+      const isConfirmed = await swalUtils.confirm(
+        'ยืนยันการออกจากระบบ?',
+        'คุณต้องการออกจากระบบ Backoffice ใช่หรือไม่'
+      );
+      if (isConfirmed) {
+        swalUtils.success('ออกจากระบบแล้ว!', 'คุณได้ออกจากระบบเรียบร้อยแล้ว');
+      }
+    } else {
+      // แจ้งเตือนแบบ Success โดยตรงผ่าน swalUtils
+      swalUtils.success('ออกจากระบบแล้ว!', 'คุณได้ออกจากระบบเรียบร้อยแล้ว');
+    }
+  };
 
   const renderContent = () => {
     switch (activeMenu) {
@@ -71,8 +89,9 @@ const Backoffice = () => {
                 </button>
               ))}
               
+              {/* ปุ่มออกจากระบบเรียกใช้งาน handleLogout */}
               <button
-                onClick={() => alert("ออกจากระบบแล้ว")}
+                onClick={handleLogout}
                 className="w-full py-3 px-4 text-xs font-semibold text-center text-rose-400 bg-rose-950/10 hover:bg-rose-950/20 transition-all duration-300"
               >
                 - ออกจากระบบ -
@@ -81,7 +100,7 @@ const Backoffice = () => {
           </div>
         </aside>
 
-        {/* CONTENT AREA ขยายกว้างสุด */}
+        {/* CONTENT AREA */}
         <main className="flex-1 bg-[#0b0b0d] border border-purple-950/60 rounded-lg p-6 md:p-8 shadow-2xl min-h-[600px] overflow-hidden">
           {renderContent()}
         </main>
