@@ -8,6 +8,7 @@ const Navbar = () => {
 
   const navLinks = [
     { name: 'หน้าหลัก', href: '/home' },
+    { name: 'เติมเงิน', href: '/topup' },
     { name: 'ร้านค้า', href: '/shop' },
     { name: 'ร้านค้ายอดสะสม', href: '/accumulate-shop' },
     { name: 'Leaderboard', href: '/leaderboard' },
@@ -62,7 +63,7 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* 🎯 คอมโพเนนต์ Popup Profile */}
+      {/* Popup Profile */}
       <ProfileModal 
         isOpen={isProfileOpen} 
         onClose={() => setIsProfileOpen(false)} 
