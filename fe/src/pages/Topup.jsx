@@ -70,7 +70,7 @@ const Topup = () => {
                 min="1"
                 step="1"
                 onKeyDown={handleKeyDown}
-                placeholder="กรอกจำนวนเติมเท่านั้น ไม่ต้องใส่ทศนิยม"
+                placeholder="กรอกจำนวนเงินที่ต้องการเติม"
                 value={amount}
                 onChange={handleAmountChange}
                 className={`w-full bg-[#0b0b0d] border ${
