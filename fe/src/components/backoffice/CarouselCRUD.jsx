@@ -39,12 +39,17 @@ const CarouselCRUD = () => {
 
   useEffect(() => {
     const savedCarousels = localStorage.getItem('carousel_images');
-    if (savedCarousels) setImages(JSON.parse(savedCarousels));
+    if (savedCarousels) {
+      const parsed = JSON.parse(savedCarousels);
+      setImages(parsed);
+    }
   }, []);
 
+  // 🛠️ แก้ไข: เพิ่ม dispatchEvent ให้ Component อื่นรู้ว่าข้อมูลเปลี่ยน
   const saveToStorage = (updatedImages) => {
     setImages(updatedImages);
     localStorage.setItem('carousel_images', JSON.stringify(updatedImages));
+    window.dispatchEvent(new Event('storage')); 
   };
 
   const handleFileChange = (e) => {
@@ -110,7 +115,7 @@ const CarouselCRUD = () => {
         <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
         <button 
           onClick={() => fileInputRef.current.click()} 
-          className="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs py-2.5 px-8 rounded-full shadow-lg shadow-purple-900/20 transition-all"
+          className="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs py-2.5 px-8 rounded-full shadow-lg shadow-purple-900/20 transition-all cursor-pointer"
         >
           {editingId ? 'เลือกไฟล์ใหม่' : 'เลือกไฟล์เพื่ออัปโหลด'}
         </button>
