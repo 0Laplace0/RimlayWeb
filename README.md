@@ -21,7 +21,7 @@
 
 ### 🗄️ Database
 * **Database Engine:** [MySQL](https://www.mysql.com/)
-* **ORM / Drive:** Prisma ORM*
+* **ORM / Drive:** Prisma ORM
 
 ---
 
