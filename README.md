@@ -21,7 +21,7 @@
 
 ### 🗄️ Database
 * **Database Engine:** [MySQL](https://www.mysql.com/)
-* **ORM / Driver:** Prisma ORM / Sequelize *(เลือกใช้อย่างใดอย่างหนึ่ง)*
+* **ORM / Drive:** Prisma ORM *
 
 ---
 
