@@ -265,7 +265,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="relative overflow-hidden bg-[#151125] border border-purple-950/40 rounded-2xl p-5 flex justify-between items-center">
             <div className="space-y-1 z-10">
-              <p className="text-xs text-gray-400 font-semibold">รายได้วันนี้ (วันที่ 21)</p>
+              <p className="text-xs text-gray-400 font-semibold">รายได้วันนี้</p>
               <h4 className="text-2xl font-bold text-white">
                 {summaryStats.todayRevenue.toLocaleString()} <span className="text-xs font-normal text-gray-500 ml-1">บาท</span>
               </h4>
@@ -285,7 +285,7 @@ const Dashboard = () => {
 
           <div className="relative overflow-hidden bg-[#151125] border border-purple-950/40 rounded-2xl p-5 flex justify-between items-center">
             <div className="space-y-1 z-10">
-              <p className="text-xs text-gray-400 font-semibold">รายได้เดือนนี้ (กันยายน)</p>
+              <p className="text-xs text-gray-400 font-semibold">รายได้เดือนนี้</p>
               <h4 className="text-2xl font-bold text-cyan-400">
                 {summaryStats.monthRevenue.toLocaleString()} <span className="text-xs font-normal text-gray-500 ml-1">บาท</span>
               </h4>
@@ -311,7 +311,7 @@ const Dashboard = () => {
           <div className="flex justify-between items-center border-b border-purple-950/30 pb-3">
             <h4 className="text-md font-bold text-purple-300 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-cyan-400" />
-              เปรียบเทียบรายได้ใน 30 วัน
+              เปรียบเทียบรายได้เดือนนี้
             </h4>
             <div className="flex gap-4 text-xs font-semibold">
               <span className="flex items-center gap-1 text-cyan-400"><span className="w-2.5 h-2.5 rounded-full bg-cyan-400"></span> จำนวนรายได้</span>
@@ -338,7 +338,7 @@ const Dashboard = () => {
           <div className="flex justify-between items-center border-b border-purple-950/30 pb-3">
             <h4 className="text-md font-bold text-purple-300 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-cyan-400" />
-              เปรียบเทียบรายได้ใน 12 เดือน
+              เปรียบเทียบรายได้ปีนี้
             </h4>
             <div className="flex gap-4 text-xs font-semibold">
               <span className="flex items-center gap-1 text-cyan-400"><span className="w-2.5 h-2.5 rounded-full bg-cyan-400"></span> จำนวนรายได้</span>
