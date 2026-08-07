@@ -1,4 +1,6 @@
 import { useState, useMemo } from 'react';
+import { Download, X, Filter, ChevronDown } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 // Mock Data ข้อมูล Log กิจกรรมทั้งหมดในระบบ
 const initialLogs = [
@@ -86,7 +88,74 @@ const ActivityLog = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('ALL');
 
-  // ฟิลเตอร์ข้อมูลตามการค้นหาและหมวดหมู่
+  // State สำหรับ Modal Export
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [exportCategory, setExportCategory] = useState('ALL');
+  const [activePeriod, setActivePeriod] = useState('Daily');
+  const [subFilter, setSubFilter] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // ดึงตัวเลือกสำหรับ Sub-filter ตาม Period จากข้อมูล Log จริง
+  const getFilteredOptions = () => {
+    if (activePeriod === 'Daily') {
+      const dates = [...new Set(logs.map(log => log.timestamp.split(' ')[0]))];
+      return dates.map(d => ({ label: d, value: d }));
+    }
+    if (activePeriod === 'Monthly') {
+      const months = [...new Set(logs.map(log => log.timestamp.substring(0, 7)))];
+      return months.map(m => ({ label: m, value: m }));
+    }
+    if (activePeriod === 'Yearly') {
+      const years = [...new Set(logs.map(log => log.timestamp.substring(0, 4)))];
+      return years.map(y => ({ label: y, value: y }));
+    }
+    if (activePeriod === 'Quarter') {
+      // ตัวอย่างจำลองไตรมาสจากข้อมูล
+      return [
+        { label: 'Q3/2026', value: '2026-07' },
+        { label: 'Q2/2026', value: '2026-04' }
+      ];
+    }
+    return [];
+  };
+
+  // ฟังก์ชันดาวน์โหลด Excel จริง
+  const handleExport = () => {
+    let dataToExport = logs;
+
+    // 1. กรองตามประเภทข้อมูล (Category) ใน Export Modal
+    if (exportCategory !== 'ALL') {
+      dataToExport = dataToExport.filter(log => log.category === exportCategory);
+    }
+
+    // 2. กรองตามระยะเวลา (Period & Sub-filter)
+    if (subFilter) {
+      dataToExport = dataToExport.filter(log => log.timestamp.startsWith(subFilter));
+    }
+
+    // 3. แปลงโครงสร้างข้อมูลให้พร้อมออกรายงาน Excel
+    const formattedData = dataToExport.map(log => ({
+      'Log ID': log.id,
+      'เวลา (Timestamp)': log.timestamp,
+      'ประเภท': log.category,
+      'ผู้ใช้งาน': log.user,
+      'IP Address': log.ip,
+      'รายละเอียดกิจกรรม': log.detail,
+      'จำนวน/มูลค่า': log.amount,
+      'สถานะ': log.status
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Activity Logs');
+
+    const fileName = `System_Logs_${exportCategory}_${activePeriod}${subFilter ? `_${subFilter}` : ''}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+
+    setIsModalOpen(false);
+  };
+
+  // ฟิลเตอร์ข้อมูลตามการค้นหาและหมวดหมู่หลักในหน้าจอ
   const filteredLogs = useMemo(() => {
     return logs.filter((log) => {
       const matchesSearch =
@@ -118,7 +187,7 @@ const ActivityLog = () => {
   };
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-6 relative">
       {/* Header & Status Indicator */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-purple-950/60 pb-5">
         <div>
@@ -132,16 +201,134 @@ const ActivityLog = () => {
           <p className="text-xs text-gray-400 mt-0.5">บันทึกประวัติพฤติกรรมผู้ใช้ในระบบแบบเรียลไทม์</p>
         </div>
 
-        {/* Quick Stats */}
+        {/* Quick Stats & Export Button */}
         <div className="flex items-center space-x-3 text-xs">
           <div className="bg-[#121217] px-3 py-1.5 rounded-lg border border-purple-900/30 text-gray-300">
             รายการทั้งหมด: <span className="font-bold text-purple-400">{logs.length}</span>
           </div>
-          <div className="bg-[#121217] px-3 py-1.5 rounded-lg border border-purple-900/30 text-gray-300">
-            สถานะเซิร์ฟเวอร์: <span className="font-bold text-emerald-400">Online</span>
-          </div>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg transition-all active:scale-95 cursor-pointer"
+          >
+            <Download className="w-4 h-4" /> Export Workbook
+          </button>
         </div>
       </div>
+
+      {/* --- EXPORT MODAL --- */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-[#151125] border border-purple-900/60 rounded-3xl p-6 w-full max-w-lg shadow-2xl space-y-6">
+            <div className="flex justify-between items-center border-b border-purple-950/40 pb-4">
+              <div className="flex items-center gap-2.5">
+                <Filter className="w-5 h-5 text-emerald-400" />
+                <h3 className="text-base font-bold text-white">Export Log Workbook (XLSX)</h3>
+              </div>
+              <button 
+                onClick={() => setIsModalOpen(false)} 
+                className="text-gray-400 hover:text-white p-2 bg-purple-950/30 rounded-xl cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* 1. Category Filter Selection */}
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Category Type</p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { id: 'ALL', label: 'ทั้งหมด' },
+                  { id: 'AUTH', label: 'AUTH' },
+                  { id: 'TOPUP', label: 'TOPUP' },
+                  { id: 'SHOP_CASH', label: 'SHOP (CASH)' },
+                  { id: 'SHOP_POINTS', label: 'POINTS SHOP' }
+                ].map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setExportCategory(cat.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                      exportCategory === cat.id
+                        ? 'bg-purple-600 text-white border-purple-600 shadow-md shadow-purple-600/30'
+                        : 'bg-transparent text-gray-400 border-purple-900 hover:border-purple-700'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 2. Period Selection */}
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Period</p>
+              <div className="flex gap-2">
+                {['Daily', 'Monthly', 'Yearly', 'Quarter'].map(p => (
+                  <button 
+                    key={p} 
+                    onClick={() => { setActivePeriod(p); setSubFilter(''); setIsDropdownOpen(false); }} 
+                    className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                      activePeriod === p ? 'bg-white text-black border-white' : 'bg-transparent text-gray-400 border-purple-900 hover:border-purple-700'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 3. Custom Dropdown Sub-Filter (ขอบมน) */}
+            <div className="space-y-3 relative">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                Select {activePeriod === 'Yearly' ? 'Year' : activePeriod === 'Quarter' ? 'Quarter' : activePeriod === 'Monthly' ? 'Month' : 'Date'}
+              </p>
+              
+              <div 
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="w-full bg-[#1c192d] border border-purple-900/50 text-white rounded-2xl p-4 text-sm flex justify-between items-center cursor-pointer hover:border-emerald-500/50 transition-all"
+              >
+                <span>{subFilter || '-- เลือกทั้งหมด --'}</span>
+                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </div>
+              
+              {isDropdownOpen && (
+                <div className="absolute top-full mt-2 w-full bg-[#1c192d] border border-purple-900/50 rounded-2xl p-2 z-50 shadow-2xl max-h-52 overflow-y-auto">
+                  <div 
+                    onClick={() => { setSubFilter(''); setIsDropdownOpen(false); }} 
+                    className={`p-3 hover:bg-emerald-600/20 rounded-xl cursor-pointer text-sm ${!subFilter ? 'text-emerald-400 font-bold' : 'text-gray-300'}`}
+                  >
+                    -- เลือกทั้งหมด --
+                  </div>
+                  {getFilteredOptions().map((opt, i) => (
+                    <div 
+                      key={i} 
+                      onClick={() => { setSubFilter(opt.value); setIsDropdownOpen(false); }} 
+                      className={`p-3 hover:bg-emerald-600/20 rounded-xl cursor-pointer text-sm ${subFilter === opt.value ? 'text-emerald-400 font-bold bg-emerald-600/10' : 'text-gray-300'}`}
+                    >
+                      {opt.label}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-4 border-t border-purple-950/40">
+              <button 
+                onClick={() => setIsModalOpen(false)} 
+                className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleExport} 
+                className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg cursor-pointer"
+              >
+                Export XLSX
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Filter & Search Bar */}
       <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
