@@ -127,7 +127,7 @@ const Dashboard = () => {
       {/* --- HEADER --- */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-purple-950/40 pb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white tracking-wide">สถิติต้านค้า</h2>
+          <h2 className="text-2xl font-bold text-white tracking-wide">สถิติร้านค้า</h2>
           <p className="text-sm text-gray-400">Statistics Overview</p>
         </div>
         <button 
