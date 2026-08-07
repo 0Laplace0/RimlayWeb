@@ -252,7 +252,7 @@ const Dashboard = () => {
 
           <div className="relative overflow-hidden bg-gradient-to-br from-blue-600/10 to-purple-600/5 border border-purple-950/50 rounded-2xl p-6 flex justify-between items-center shadow-lg">
             <div className="space-y-2 z-10">
-              <p className="text-sm font-semibold text-purple-300">โควต้า SlipOk คงเหลือ</p>
+              <p className="text-sm font-semibold text-purple-300">โควต้า Slip คงเหลือ</p>
               <h3 className="text-3xl font-extrabold text-emerald-400">
                 {summaryStats.remainingSlipOk.toLocaleString()} <span className="text-sm font-normal text-gray-400 ml-1">สลิป</span>
               </h3>
